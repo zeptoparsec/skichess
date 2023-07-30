@@ -45,16 +45,7 @@ class Boardstate:
             print(chr(64+i),end=' ')
         print()
 
-    def __converttopos(self, move):
-        x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
-        y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
-
-        startpos = x_axis[move[0]]+y_axis[move[1]]*8-1
-        endpos = x_axis[move[2]]+y_axis[move[3]]*8-1
-
-        return (startpos, endpos)
-
-    def __makemove(self, startpos, endpos):
+    def makemove(self, startpos, endpos):
         if self._board[endpos].col == self._board[startpos].col or self._board[startpos].col == 'N':
             return -1
         elif self._board[endpos].col != 'N':
@@ -64,6 +55,3 @@ class Boardstate:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
             # Maybe do some move validation here?
         return 0
-    def ucimakemove(self, move):
-        pos = self.__converttopos(move)
-        self.__makemove(pos[0],pos[1])
