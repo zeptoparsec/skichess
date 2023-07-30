@@ -68,8 +68,5 @@ class Checkmove:
         self.type = board[startpos].name
         self.board = board
         
-        if not self.__check_pawn(): return -1
-        # if self.__check_meta() or self.__check_piece():
-        #     return 1
-        # else:
-        #     return -1
+        if self.__check_piece() or self.__check_meta(): return 1
+        else: return -1
