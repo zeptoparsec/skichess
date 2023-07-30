@@ -4,6 +4,7 @@ class piece:
         self.pos = pos
         self.val = val
         self.col = col
+
 class boardstate:
     def __init__(self) -> None:
         self._board = [None]*64
@@ -35,6 +36,7 @@ class boardstate:
     def printboard(self):
         pieces = {'PW': '♟', 'RW': '♜', 'NW': '♞', 'BW': '♝', 'KW': '♚', 'QW': '♛', 'EN' : ' ',
            'PB': '♙', 'RB': '♖', 'NB': '♘', 'BB': '♗', 'KB': '♔', 'QB': '♕'}
+        
         for i in range(8):
             print(8-i,end=' ')
 
@@ -46,17 +48,29 @@ class boardstate:
             print(chr(64+i),end=' ')
         print()
 
+    def __convert_pos(pos):
+        x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
+        y_axis = {8: 1, 7: 2, 6: 3, 5: 4, 4: 5, 3: 6, 2: 7, 1: 8}
+
+        
+
+        return 
+
     def makemove(self, startpos, endpos):
+        #startpos = self.__convert_pos(startpos)
+        #endpos = self.__convert_pos(endpos)
+
         if self._board[endpos].col == self._board[startpos].col or self._board[startpos].col == 'N':
             return -1
         elif self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
             self._board[startpos] = piece('E',startpos,0,'N')
         else:
-            tmp = self._board[startpos]
-            self._board[startpos] = self._board[endpos]
-            self._board[endpos] = tmp # Maybe do some move validation here?
+            self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
+            # Maybe do some move validation here?
         return 0
     
 board = boardstate()
+#a7 - a6
+board.makemove(48, 48 - 8)
 board.printboard()
