@@ -72,8 +72,6 @@ class boardstate:
         return 0
     def ucimakemove(self, move):
         pos = self.__convertto_pos(move)
-        print(pos[0])
-        print(pos[1])
         self.makemove(pos[0],pos[1])
     
 board = boardstate()
