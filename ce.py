@@ -33,11 +33,13 @@ class boardstate:
             self._board[i] = piece('E',i,0,'N')
 
     def printboard(self):
+        pieces = {'PW': '♟', 'RW': '♜', 'NW': '♞', 'BW': '♝', 'KW': '♚', 'QW': '♛', 'EN' : ' ',
+           'PB': '♙', 'RB': '♖', 'NB': '♘', 'BB': '♗', 'KB': '♔', 'QB': '♕'}
         for i in range(8):
             print(8-i,end=' ')
 
             for j in range(8):
-                print(self._board[8*i+j].name, end=' ')
+                print(pieces[self._board[8*i+j].name+self._board[8*i+j].col], end=' ')
             print()
         print(end='  ')
         for i in range(1,9):
@@ -55,3 +57,6 @@ class boardstate:
             self._board[startpos] = self._board[endpos]
             self._board[endpos] = tmp # Maybe do some move validation here?
         return 0
+    
+board = boardstate()
+board.printboard()
