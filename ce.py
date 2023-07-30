@@ -4,10 +4,6 @@ from time import sleep
 
 board = Boardstate()
 
-def switch_turn(turn):
-    if turn == 'w': return 'b'
-    else: return 'w'
-
 turn = "w"
 while True:
     system('cls')
@@ -19,4 +15,4 @@ while True:
     except: 
         print("Invalid move!\n")
         sleep(1)
-    else: turn = switch_turn(turn)
+    else: turn = 'w' if turn == 'b' else 'b'
