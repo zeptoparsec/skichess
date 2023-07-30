@@ -14,13 +14,13 @@ while True:
     if turn:
         move = input("White's turn: ").lower()
     else:
-        move = input("Black's turn: ")
+        move = input("Black's turn: ").lower()
 
-    startpos = x_axis[move[0]]+y_axis[move[1]]*8-1
-    endpos = x_axis[move[2]]+y_axis[move[3]]*8-1
+    startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
+    endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
 
     try:
-        board.makemove(startpos, endpos)
+        if board.makemove(startpos, endpos, turn) == -1: 1/0
     except: 
         print("Invalid move!\b\n")
         sleep(1)
