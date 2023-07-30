@@ -45,19 +45,19 @@ class Checkmove:
         elif self.type == 'B': return self.__check_bishop()
         elif self.type == 'Q': return self.__check_queen()
         elif self.type == 'K': return self.__check_king()
-        else: print("Error: line 29 of chechmove.py")
+        else: raise Exception('Unknown error in __check_piece')
 
     def __check_castling():
         pass
 
-    def __check_enpasant():
+    def __check_enpassant():
         pass
 
     def __check_promotion():
         pass
 
-    def __check_meta(self): #stuff like castling, en pasant, promotion
-        if self.__check_castling() or self.__check_enpasant() or self.__check_promotion():
+    def __check_meta(self): #stuff like castling, en passant, promotion
+        if self.__check_castling() or self.__check_enpassant() or self.__check_promotion():
             return True
         else: 
             return False
