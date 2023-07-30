@@ -53,9 +53,9 @@ class Boardstate:
         is_valid_move = checkmove.check(startpos, endpos, self._board) != -1
         is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
 
-        if  is_same_colour or is_empty_space or  not (is_valid_move or is_correct_piece):
+        if  is_same_colour or is_empty_space or  not (is_valid_move and is_correct_piece):
             return -1
-        elif self._board[endpos].col == 'N':
+        elif self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
             self._board[startpos] = piece('E',startpos,0,'N')
         else:
