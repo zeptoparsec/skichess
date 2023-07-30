@@ -1,6 +1,8 @@
 from piece import Piece
+from checkmove import Checkmove
 
 piece = Piece
+checkmove = Checkmove()
 
 class Boardstate:
     def __init__(self):
@@ -45,13 +47,17 @@ class Boardstate:
             print(chr(64+i),end=' ')
         print()
 
-    def makemove(self, startpos, endpos):
-        if self._board[endpos].col == self._board[startpos].col or self._board[startpos].col == 'N':
+    def makemove(self, startpos, endpos, turn):
+        is_same_colour =  self._board[endpos].col == self._board[startpos].col
+        is_empty_space = self._board[startpos].col == 'N'
+        is_valid_move = checkmove.check(startpos, endpos, self._board) != -1
+        is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
+
+        if  is_same_colour or is_empty_space or  not (is_valid_move or is_correct_piece):
             return -1
-        elif self._board[endpos].col != 'N':
+        elif self._board[endpos].col == 'N':
             self._board[endpos] = self._board[startpos]
             self._board[startpos] = piece('E',startpos,0,'N')
         else:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
-            # Maybe do some move validation here?
         return 0
