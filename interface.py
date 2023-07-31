@@ -20,7 +20,7 @@ while True:
     endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
 
     try:
-        if board.makemove(startpos, endpos, turn) == -1: 1/0
+        if board.makemove(startpos, endpos, turn) == -1: raise Exception
     except: 
         print("Invalid move!\b\n")
         sleep(1)
