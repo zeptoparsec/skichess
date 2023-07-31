@@ -38,7 +38,9 @@ class Checkmove:
         pass
 
     def __check_king(self):
-        pass
+        if self.drow in [-1,0,1] and self.dcol in [-1,0,1]:
+            return True
+        return False
 
     def __check_piece(self):
         if self.type == 'P': return self.__check_pawn()
@@ -68,6 +70,8 @@ class Checkmove:
         self.pos = startpos
         self.target = endpos
         self.type = self.board[startpos].name
+        self.drow = self.target%8 - self.pos%8
+        self.dcol = self.target//8 - self.pos//8
         
         if self.__check_piece() or self.__check_meta(): return 1
         else: return -1
