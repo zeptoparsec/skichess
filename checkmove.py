@@ -1,4 +1,6 @@
 class Checkmove:
+    def __init__(self, board) -> None:
+        self.board = board
 
     def __check_pawn(self):
         if self.board[self.pos].col == 'B': 
@@ -62,11 +64,10 @@ class Checkmove:
         else: 
             return False
 
-    def check(self, startpos, endpos, board):
+    def check(self, startpos, endpos):
         self.pos = startpos
         self.target = endpos
-        self.type = board[startpos].name
-        self.board = board
+        self.type = self.board[startpos].name
         
         if self.__check_piece() or self.__check_meta(): return 1
         else: return -1

@@ -2,7 +2,6 @@ from piece import Piece
 from checkmove import Checkmove
 
 piece = Piece
-checkmove = Checkmove()
 
 class Boardstate:
     def __init__(self):
@@ -48,9 +47,11 @@ class Boardstate:
         print()
 
     def makemove(self, startpos, endpos, turn):
+        checkmove = Checkmove(self._board) # I don't want to do this...
+
         is_same_colour =  self._board[endpos].col == self._board[startpos].col
         is_empty_space = self._board[startpos].col == 'N'
-        is_valid_move = checkmove.check(startpos, endpos, self._board) != -1
+        is_valid_move = checkmove.check(startpos, endpos) != -1
         is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
 
         if  is_same_colour or is_empty_space or  not (is_valid_move and is_correct_piece):
