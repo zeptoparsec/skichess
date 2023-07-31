@@ -25,7 +25,13 @@ class Checkmove:
         return self.drow == 0 or self.dcol == 0
     
     def __check_knight(self):
-        pass
+        extr_top = self.target == self.pos + (8*2 - 1) or self.target == self.pos + (8*2 + 1)
+        top = self.target == self.pos + (8 + 2) or self.target == self.pos + (8 - 2)
+        bottom = self.target == self.pos - (8 + 2) or self.target == self.pos - (8 - 2)
+        extr_bottom = self.target == self.pos - (8*2 - 1) or self.target == self.pos - (8*2 + 1)
+
+        if extr_top or top or bottom or extr_bottom: return True
+        else: return False
 
     def __check_bishop(self):
         return self.drow == self.dcol
