@@ -2,11 +2,6 @@ from boardstate import Boardstate
 from os import system
 from time import sleep
 
-def sanitizeinput(input):
-    if len(input) != 4:
-        return -1
-    return 0
-
 board = Boardstate()
 
 x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
@@ -21,16 +16,14 @@ while True:
     else:
         move = input("Black's turn: ").lower()
 
-    if sanitizeinput(move) != 0:
-        print('Invalid input!\n')
+    try:
+        startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
+        endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
+
+        is_valid_input = (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric()) == (len(move) == 4)
+        if not is_valid_input or board.makemove(startpos, endpos, turn) == -1: raise Exception
+    except: 
+        print("Invalid move!")
         sleep(1)
     else:
-        try:
-            startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
-            endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
-            if board.makemove(startpos, endpos, turn) == -1: raise Exception
-        except: 
-            print("Invalid move!")
-            sleep(1)
-        else:
-            turn = not turn
+        turn = not turn
