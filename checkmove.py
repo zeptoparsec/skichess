@@ -6,23 +6,19 @@ class Checkmove:
         if self.board[self.pos].col == 'B': 
             if self.pos <= 15 and self.pos >= 8:
                 if self.target == self.pos + (8) or self.target == self.pos + (8*2):
-                    if self.board[self.target].col == 'N':
-                        return True
+                    return self.board[self.target].col == 'N'
             elif self.target == self.pos + (8) and self.board[self.target].col == 'N':
                 return True
             if self.target == self.pos + (8 + 1) or self.target == self.pos + (8 - 1):
-                if self.board[self.target].col == 'W':
-                    return True
+                return self.board[self.target].col == 'W'
         else: 
             if self.pos >= 63 - 15 and self.pos <= 63 - 8:
                 if self.target == self.pos - (8) or self.target == self.pos - (8*2):
-                    if self.board[self.target].col == 'N':
-                        return True
+                    return self.board[self.target].col == 'N'
             elif self.target == self.pos - (8) and self.board[self.target].col == 'N':
                 return True
             if self.target == self.pos - (8 + 1) or self.target == self.pos - (8 - 1):
-                if self.board[self.target].col == 'B':
-                    return True
+                return self.board[self.target].col == 'B'
         return False
 
     def __check_rook(self):
