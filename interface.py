@@ -25,13 +25,12 @@ while True:
         print('Invalid input!\n')
         sleep(1)
     else:
-        startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
-        endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
-
         try:
+            startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
+            endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
             if board.makemove(startpos, endpos, turn) == -1: raise Exception
         except: 
-            print("Invalid move!\b\n")
+            print("Invalid move!")
             sleep(1)
         else:
             turn = not turn
