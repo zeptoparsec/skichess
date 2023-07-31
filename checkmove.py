@@ -26,21 +26,19 @@ class Checkmove:
         return False
 
     def __check_rook(self):
-        pass
-
+        return self.drow == 0 or self.dcol == 0
+    
     def __check_knight(self):
         pass
 
     def __check_bishop(self):
-        pass
+        return self.drow == self.dcol
 
     def __check_queen(self):
-        pass
+        return self.__checkrook() or self.__checkbishop()
 
     def __check_king(self):
-        if self.drow in [-1,0,1] and self.dcol in [-1,0,1]:
-            return True
-        return False
+        return self.drow in [-1,0,1] and self.dcol in [-1,0,1]
 
     def __check_piece(self):
         if self.type == 'P': return self.__check_pawn()
