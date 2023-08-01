@@ -17,6 +17,11 @@ while True:
         move = input("Black's turn: ").lower()
 
     try:
+        if move == 'restart':
+            board.restart()
+            turn = True
+            continue
+
         startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
         endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
 

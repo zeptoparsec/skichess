@@ -37,7 +37,7 @@ class Checkmove:
         return self.drow == self.dcol
 
     def __check_queen(self):
-        return self.__checkrook() or self.__checkbishop()
+        return self.__check_rook() or self.__check_bishop()
 
     def __check_king(self):
         return self.drow in [-1,0,1] and self.dcol in [-1,0,1]

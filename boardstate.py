@@ -3,7 +3,7 @@ from checkmove import Checkmove
 
 class Boardstate:
     def __init__(self):
-        self._board = [None]*64
+        self._board = [Piece('E',0,0,'N')]*64
         self._board[0] = Piece('R',0,5,'B')
         self._board[1] = Piece('N',1,3.2,'B')
         self._board[2] = Piece('B',2,3.3,'B')
@@ -28,6 +28,7 @@ class Boardstate:
 
         for i in range(16,48):
             self._board[i] = Piece('E',i,0,'N')
+        self._boardlist = [self._board]
 
     def printboard(self):
         pieces = {'PW': '♟', 'RW': '♜', 'NW': '♞', 'BW': '♝', 'KW': '♚', 'QW': '♛', 'EN' : ' ',
@@ -44,6 +45,9 @@ class Boardstate:
             print(chr(64+i),end=' ')
         print()
 
+    def restart(self):
+        self.__init__()
+
     def makemove(self, startpos, endpos, turn):
         checkmove = Checkmove(self._board) # I don't want to do this...
 
@@ -53,10 +57,12 @@ class Boardstate:
         is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
 
         if  is_same_colour or is_empty_space or  not (is_valid_move and is_correct_piece):
+            self._boardlist.pop()
             return -1
         elif self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
             self._board[startpos] = Piece('E',startpos,0,'N')
         else:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
+        self._boardlist.append(self._board)
         return 0
