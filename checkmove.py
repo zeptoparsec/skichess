@@ -70,8 +70,12 @@ class Checkmove:
         self.pos = startpos
         self.target = endpos
         self.type = self.board[startpos].name
-        self.drow = self.target%8 - self.pos%8
-        self.dcol = self.target//8 - self.pos//8
-        
+        self.erow = self.target//8
+        self.srow = self.pos//8
+        self.ecol = self.target%8
+        self.scol = self.pos%8
+        self.drow = self.erow - self.srow
+        self.dcol = self.ecol - self.scol
+
         if self.__check_piece() or self.__check_meta(): return 1
         else: return -1
