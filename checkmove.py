@@ -22,7 +22,27 @@ class Checkmove:
         return False
 
     def __check_rook(self):
-        return self.drow == 0 or self.dcol == 0
+        if self.drow == 0:
+            if self.dcol > 0:
+                for i in range(self.dcol):
+                    if self.board[self.pos+i].col != 'N':
+                        return False
+            else:
+                for i in range(self.dcol):
+                    if self.board[self.pos-i].col != 'N':
+                        return False
+        elif self.dcol == 0:
+            if self.drow > 0:
+                for i in range(self.drow):
+                    if self.board[self.pos+8*i].col != 'N':
+                        return False
+            else:
+                for i in range(self.drow):
+                    if self.board[self.pos-8*i].col != 'N':
+                        return False
+        else:
+            return False
+        return True
     
     def __check_knight(self):
         extr_top = self.target == self.pos + (8*2 - 1) or self.target == self.pos + (8*2 + 1)
