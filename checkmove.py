@@ -22,22 +22,22 @@ class Checkmove:
         return False
 
     def __check_rook(self):
-        if self.drow == 0:
-            if self.dcol > 0:
-                for i in range(self.dcol):
+        if self.dy == 0:
+            if self.dx > 0:
+                for i in range(1, self.dx):
                     if self.board[self.pos+i].col != 'N':
                         return False
             else:
-                for i in range(self.dcol):
+                for i in range(1, abs(self.dx)):
                     if self.board[self.pos-i].col != 'N':
                         return False
-        elif self.dcol == 0:
-            if self.drow > 0:
-                for i in range(self.drow):
+        elif self.dx == 0:
+            if self.dy > 0:
+                for i in range(1, self.dy):
                     if self.board[self.pos+8*i].col != 'N':
                         return False
             else:
-                for i in range(self.drow):
+                for i in range(1, abs(self.dy)):
                     if self.board[self.pos-8*i].col != 'N':
                         return False
         else:
@@ -54,13 +54,13 @@ class Checkmove:
         else: return False
 
     def __check_bishop(self):
-        return self.drow == self.dcol
+        return self.dy == self.dx
 
     def __check_queen(self):
         return self.__check_rook() or self.__check_bishop()
 
     def __check_king(self):
-        return self.drow in [-1,0,1] and self.dcol in [-1,0,1]
+        return self.dy in [-1,0,1] and self.dx in [-1,0,1]
 
     def __check_piece(self):
         if self.type == 'P': return self.__check_pawn()
@@ -94,8 +94,8 @@ class Checkmove:
         self.srow = self.pos//8
         self.ecol = self.target%8
         self.scol = self.pos%8
-        self.drow = self.erow - self.srow
-        self.dcol = self.ecol - self.scol
+        self.dy = self.erow - self.srow
+        self.dx = self.ecol - self.scol
 
         if self.__check_piece() or self.__check_meta(): return 1
         else: return -1
