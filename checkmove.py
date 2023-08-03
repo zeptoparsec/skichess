@@ -23,25 +23,18 @@ class Checkmove:
 
     def __check_rook(self):
         if self.dy == 0:
-            if self.dx > 0:
-                for i in range(1, self.dx):
-                    if self.board[self.pos+i].col != 'N':
-                        return False
-            else:
-                for i in range(1, abs(self.dx)):
-                    if self.board[self.pos-i].col != 'N':
-                        return False
+            for i in range(1, abs(self.dx)):
+                if self.dx > 0:
+                    if self.board[self.pos + i].col != 'N': return False
+                else:
+                    if self.board[self.pos - i].col != 'N': return False
         elif self.dx == 0:
-            if self.dy > 0:
-                for i in range(1, self.dy):
-                    if self.board[self.pos+8*i].col != 'N':
-                        return False
-            else:
-                for i in range(1, abs(self.dy)):
-                    if self.board[self.pos-8*i].col != 'N':
-                        return False
-        else:
-            return False
+            for i in range(1, abs(self.dy)):
+                if self.dy > 0:
+                    if self.board[self.pos + 8*i].col != 'N': return False
+                else:
+                    if self.board[self.pos - 8*i].col != 'N': return False
+        else: return False
         return True
     
     def __check_knight(self):
@@ -54,7 +47,22 @@ class Checkmove:
         else: return False
 
     def __check_bishop(self):
-        return self.dy == self.dx
+        iterate = abs(self.dx)
+        if abs(self.dx) == abs(self.dy):
+            if self.dy < 0:
+                for i in range(1, iterate):
+                    if self.dx > 0:
+                        if self.board[self.pos - i*8 + i].col != 'N': return False
+                    else:
+                        if self.board[self.pos - i*8 - i].col != 'N': return False
+            else:
+                for i in range(1, iterate):
+                    if self.dx > 0:
+                        if self.board[self.pos + i*8 + i].col != 'N': return False
+                    else:
+                        if self.board[self.pos + i*8 - i].col != 'N': return False
+        else: return False
+        return True
 
     def __check_queen(self):
         return self.__check_rook() or self.__check_bishop()
