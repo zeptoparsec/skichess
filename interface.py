@@ -11,11 +11,24 @@ y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
 then = 0
 now = 0
 
+time = [600,600]
+
 turn = True
 while True:
     system('cls')
     board.printboard()
-    print("You spent",then-now,"seconds on the previous move.")
+
+    time[int(not turn)] -= then - now
+
+    print("You spent",then-now,"seconds on the previous move.\nYou have",time[int(not turn)],'seconds left.')
+
+    if time[0] <= 0:
+        print('Black ran out of time!')
+        break
+    if time[1] <= 0:
+        print('White ran out of time!')
+        break
+
     now = int(datetime.now().timestamp())
 
     if turn:
