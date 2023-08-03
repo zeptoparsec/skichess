@@ -1,20 +1,28 @@
 from boardstate import Boardstate
 from os import system
 from time import sleep
+from datetime import datetime
 
 board = Boardstate()
 
 x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
 y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
 
+then = 0
+now = 0
+
 turn = True
 while True:
     system('cls')
     board.printboard()
+    print("You spent",then-now,"seconds on the previous move.")
+    now = int(datetime.now().timestamp())
+
     if turn:
         move = input("White's turn: ").lower()
     else:
         move = input("Black's turn: ").lower()
+    then = int(datetime.now().timestamp())
 
     try:
         if move == 'restart':
