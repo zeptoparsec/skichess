@@ -80,13 +80,15 @@ class Checkmove:
         else: raise Exception('Unknown error in __check_piece')
 
     def __check_promotion(self):
-        if self.board[self.pos].move or not self.__check_pawn(): return False
-        if self.board[self.target].col == 'B':
-            if 56 <= self.board[self.target] <= 63: return True
-        else: 
-            if 0 <= self.board[self.target] <= 7: return True
-                
+        if not self.__check_pawn(): return False
 
+        if self.board[self.pos].col == 'B':
+            if 56 <= self.target <= 63: return True
+        else: 
+            if 0 <= self.target <= 7: return True
+
+        return False
+    
     def __check_castling(self):
         return False
     
@@ -101,6 +103,7 @@ class Checkmove:
         self.dx = self.target%8 - self.pos%8
 
         if self.__check_promotion(): return "promotion"
-        if self.__check_castling(): return "castling"
-        if self.__check_enpassant(): return "enpassant"
+        elif self.__check_castling(): return "castling"
+        elif self.__check_enpassant(): return "enpassant"
+
         return self.__check_piece()
