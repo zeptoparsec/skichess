@@ -23,15 +23,21 @@ class Boardstate:
 
         for i in range(8,16):
             self._board[i] = Piece('P',i,1,'B')
+
         for i in range(48,56):
             self._board[i] = Piece('P',i,1,'W')
 
         for i in range(16,48):
             self._board[i] = Piece('E',i,0,'N')
-        self._boardlist = [self._board]
 
-    def printboard(self):
-        pieces = {'PW': '♟', 'RW': '♜', 'NW': '♞', 'BW': '♝', 'KW': '♚', 'QW': '♛', 'EN' : ' ',
+        self._movehistory = ''
+
+    def printboard(self, legacy):
+        if legacy:
+            pieces = {'PW': 'P', 'RW': 'R', 'NW': 'N', 'BW': 'B', 'KW': 'K', 'QW': 'Q', 'EN' : ' ',
+           'PB': 'p', 'RB': 'r', 'NB': 'n', 'BB': 'b', 'KB': 'k', 'QB': 'q'}
+        else:
+            pieces = {'PW': '♟', 'RW': '♜', 'NW': '♞', 'BW': '♝', 'KW': '♚', 'QW': '♛', 'EN' : ' ',
            'PB': '♙', 'RB': '♖', 'NB': '♘', 'BB': '♗', 'KB': '♔', 'QB': '♕'}
         
         for i in range(8):
@@ -48,21 +54,30 @@ class Boardstate:
     def restart(self):
         self.__init__()
 
-    def makemove(self, startpos, endpos, turn):
+    def makemove(self, startpos, endpos, turn, move):
         checkmove = Checkmove(self._board) # I don't want to do this...
 
         is_same_colour =  self._board[endpos].col == self._board[startpos].col
         is_empty_space = self._board[startpos].col == 'N'
-        is_valid_move = checkmove.check(startpos, endpos) != -1
+        is_valid_move = checkmove.check(startpos, endpos)
         is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
 
-        if  is_same_colour or is_empty_space or  not (is_valid_move and is_correct_piece):
-            self._boardlist.pop()
+        if is_same_colour or is_empty_space or not (is_correct_piece and is_valid_move):
+            self._movehistory = self._movehistory[0:len(self._movehistory)-5]
             return -1
+        elif is_valid_move == "promotion":
+            pass
+        elif is_valid_move == "enpassant":
+            pass
+        elif is_valid_move == "castling":
+            pass
         elif self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
             self._board[startpos] = Piece('E',startpos,0,'N')
         else:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
-        self._boardlist.append(self._board)
+        
+        self._board[endpos].moved = True
+
+        self._movehistory += move+' '
         return 0
