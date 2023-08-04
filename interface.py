@@ -12,19 +12,23 @@ then = 0
 now = 0
 
 time = [600,600]
+inc = [1,1]
 
 turn = True
+legacy = False
+
 while True:
     system('cls')
-    board.printboard()
+    board.printboard(legacy)
 
-    time[int(not turn)] -= then - now
+    time[int(not turn)] -= then - now - inc[int(not turn)]
 
     print("You spent",then-now,"seconds on the previous move.\nYou have",time[int(not turn)],'seconds left.')
 
     if time[0] <= 0:
         print('Black ran out of time!')
         break
+    
     if time[1] <= 0:
         print('White ran out of time!')
         break
@@ -40,6 +44,15 @@ while True:
     try:
         if move == 'restart':
             board.restart()
+            time = [600, 600]
+            turn = True
+            continue
+
+        if move == 'legacy':
+            print('Legacy')
+            legacy = True
+            time = [600, 600]
+            board.restart()
             turn = True
             continue
 
@@ -47,7 +60,7 @@ while True:
         endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
 
         is_valid_input = (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric()) == (len(move) == 4)
-        if not is_valid_input or board.makemove(startpos, endpos, turn) == -1: raise Exception
+        if not is_valid_input or board.makemove(startpos, endpos, turn, move) == -1: raise Exception
     except: 
         print("Invalid move!")
         sleep(1)
