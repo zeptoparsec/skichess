@@ -62,14 +62,17 @@ class Boardstate:
         is_valid_move = checkmove.check(startpos, endpos)
         is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
 
-        if is_same_colour or is_empty_space or not (is_correct_piece and is_valid_move):
+        if is_same_colour or is_empty_space or not is_correct_piece or is_valid_move == False:
             self._movehistory = self._movehistory[0:len(self._movehistory)-5]
             return -1
         elif is_valid_move == "promotion":
+            #execute promotion
             pass
         elif is_valid_move == "enpassant":
+            #execute enpassant
             pass
         elif is_valid_move == "castling":
+            #execute castling
             pass
         elif self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
@@ -78,6 +81,5 @@ class Boardstate:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
         
         self._board[endpos].moved = True
-
         self._movehistory += move+' '
         return 0
