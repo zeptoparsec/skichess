@@ -23,7 +23,8 @@ while True:
 
     time[int(not turn)] -= then - now - inc[int(not turn)]
 
-    print("You spent",then-now,"seconds on the previous move.\nYou have",time[int(not turn)],'seconds left.')
+    print("Time spent:",then-now)
+    print("Time left :", time[int(not turn)])
 
     if time[0] <= 0:
         print('Black ran out of time!')
