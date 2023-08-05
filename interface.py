@@ -1,5 +1,5 @@
 from boardstate import Boardstate
-from os import system
+from os import system, name
 from time import sleep
 from datetime import datetime
 
@@ -18,7 +18,10 @@ turn = True
 legacy = False
 
 while True:
-    system('cls')
+    if name == 'nt':
+        system('cls')
+    else:
+        system('clear')
     board.printboard(legacy)
 
     time[int(not turn)] -= then - now - inc[int(not turn)]
