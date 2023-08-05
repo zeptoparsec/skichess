@@ -3,32 +3,32 @@ from checkmove import Checkmove
 
 class Boardstate:
     def __init__(self):
-        self._board = [Piece('E',0,0,'N')]*64
-        self._board[0] = Piece('R',0,5,'B')
-        self._board[1] = Piece('N',1,3.2,'B')
-        self._board[2] = Piece('B',2,3.3,'B')
-        self._board[3] = Piece('Q',3,9,'B')
-        self._board[4] = Piece('K',4,200,'B')
-        self._board[5] = Piece('B',5,3.3,'B')
-        self._board[6] = Piece('N',6,3.2,'B')
-        self._board[7] = Piece('R',7,5,'B')
-        self._board[63-0] = Piece('R',0,5,'W')
-        self._board[63-1] = Piece('N',1,3.2,'W')
-        self._board[63-2] = Piece('B',2,3.3,'W')
-        self._board[63-3] = Piece('K',3,200,'W')
-        self._board[63-4] = Piece('Q',4,9,'W')
-        self._board[63-5] = Piece('B',5,3.3,'W')
-        self._board[63-6] = Piece('N',6,3.2,'W')
-        self._board[63-7] = Piece('R',7,5,'W')
+        self._board = [Piece('E',0,0,'N',[])]*64
+        self._board[0] = Piece('R',0,5,'B',[])
+        self._board[1] = Piece('N',1,3.2,'B',[])
+        self._board[2] = Piece('B',2,3.3,'B',[])
+        self._board[3] = Piece('Q',3,9,'B',[])
+        self._board[4] = Piece('K',4,200,'B',[])
+        self._board[5] = Piece('B',5,3.3,'B',[])
+        self._board[6] = Piece('N',6,3.2,'B',[])
+        self._board[7] = Piece('R',7,5,'B',[])
+        self._board[63-0] = Piece('R',0,5,'W',[])
+        self._board[63-1] = Piece('N',1,3.2,'W',[])
+        self._board[63-2] = Piece('B',2,3.3,'W',[])
+        self._board[63-3] = Piece('K',3,200,'W',[])
+        self._board[63-4] = Piece('Q',4,9,'W',[])
+        self._board[63-5] = Piece('B',5,3.3,'W',[])
+        self._board[63-6] = Piece('N',6,3.2,'W',[])
+        self._board[63-7] = Piece('R',7,5,'W',[])
 
         for i in range(8,16):
-            self._board[i] = Piece('P',i,1,'B')
+            self._board[i] = Piece('P',i,1,'B', [0,  0,  0,  0,  0,  0,  0,  0, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 20, 30, 30, 20, 10, 10, 5, 5, 10, 25, 25, 10, 5,  5, 0,  0,  0, 20, 20,  0,  0,  0, 5, -5,-10,  0,  0,-10, -5,  5, 5, 10, 10,-20,-20, 10, 10,  5, 0,  0,  0,  0,  0,  0,  0,  0])
 
         for i in range(48,56):
-            self._board[i] = Piece('P',i,1,'W')
+            self._board[i] = Piece('P',i,1,'W',[0,  0,  0,  0,  0,  0,  0,  0, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 20, 30, 30, 20, 10, 10, 5, 5, 10, 25, 25, 10, 5,  5, 0,  0,  0, 20, 20,  0,  0,  0, 5, -5,-10,  0,  0,-10, -5,  5, 5, 10, 10,-20,-20, 10, 10,  5, 0,  0,  0,  0,  0,  0,  0,  0])
 
         for i in range(16,48):
-            self._board[i] = Piece('E',i,0,'N')
+            self._board[i] = Piece('E',i,0,'N',[])
 
         self._movehistory = ''
 
@@ -76,7 +76,7 @@ class Boardstate:
             pass
         elif self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
-            self._board[startpos] = Piece('E',startpos,0,'N')
+            self._board[startpos] = Piece('E',startpos,0,'N',[])
         else:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
         
