@@ -17,11 +17,24 @@ inc = [1,1]
 turn = True
 legacy = False
 
+def makemove(move):
+    startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
+    endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
+
+    is_valid_input = (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric()) == (len(move) == 4)
+    if not is_valid_input or board.makemove(startpos, endpos, turn, move) == -1: raise Exception
+
+def reset(board,time,turn):
+    board.restart()
+    time = [600, 600]
+    turn = True
+
 while True:
     if name == 'nt':
         system('cls')
     else:
         system('clear')
+
     board.printboard(legacy)
 
     time[int(not turn)] -= then - now - inc[int(not turn)]
@@ -47,24 +60,47 @@ while True:
 
     try:
         if move == 'restart':
-            board.restart()
-            time = [600, 600]
-            turn = True
+            reset(board,time,turn)
             continue
 
         if move == 'legacy':
             print('Legacy')
             legacy = True
-            time = [600, 600]
-            board.restart()
-            turn = True
+            reset(board,time,turn)
             continue
 
-        startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
-        endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
+        if move == 'save':
+            if name == 'nt':
+                system('cls')
+            else:
+                system('clear')
 
-        is_valid_input = (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric()) == (len(move) == 4)
-        if not is_valid_input or board.makemove(startpos, endpos, turn, move) == -1: raise Exception
+            file = open(input('Enter the filename to save the game in: '), 'w')
+            file.write(board.getMoveHistory())
+
+            continue
+
+        if move == 'load':
+            if name == 'nt':
+                system('cls')
+            else:
+                system('clear')
+
+            game = open(input('Enter the file to load the game from: '),'r').read()
+
+            turn = True
+
+            for i in game.split():
+                makemove(i)
+                turn = not turn
+
+            board.loadGame(game)
+
+            time = [600,600]
+
+            continue
+
+        makemove(move)
     except: 
         print("Invalid move!")
         sleep(1)

@@ -83,3 +83,9 @@ class Boardstate:
         self._board[endpos].moved = True
         self._movehistory += move+' '
         return 0
+
+    def getMoveHistory(self):
+        return self._movehistory
+
+    def loadGame(self, movehistory):
+        self._movehistory = movehistory
