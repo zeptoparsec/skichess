@@ -2,6 +2,8 @@ from boardstate import Boardstate
 from os import system, name
 from time import sleep
 from datetime import datetime
+from pynput import keyboard
+from pynput.keyboard import Key
 
 board = Boardstate()
 
@@ -17,6 +19,10 @@ inc = [1,1]
 turn = True
 legacy = False
 
+pointer = 0
+
+options = [' New untimed Game',' New timed Game',' Load Game']
+
 def makemove(move):
     startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
     endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
@@ -24,16 +30,51 @@ def makemove(move):
     is_valid_input = (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric()) == (len(move) == 4)
     if not is_valid_input or board.makemove(startpos, endpos, turn, move) == -1: raise Exception
 
-def reset(board,time,turn):
-    board.restart()
-    time = [600, 600]
-    turn = True
-
-while True:
+def clearscreen():
     if name == 'nt':
         system('cls')
     else:
         system('clear')
+
+"""
+def menu():
+    global pointer
+
+    print('Welcome to <nameless>!')
+    for i in range(len(options)):
+        if i == pointer:
+            print(end='>')
+        else:
+            print(end=' ')
+        print(options[i])
+
+def on_key_updown(key):
+    clearscreen()
+
+    global pointer
+
+    if key == Key.up:
+        pointer -= 1
+    elif key == Key.down:
+        pointer += 1
+    elif key == Key.enter:
+        exit()
+
+    if pointer <= 0:
+        pointer = 0
+    elif pointer >= len(options):
+        pointer = len(options) - 1
+
+    menu()
+
+menu()
+
+with keyboard.Listener(on_release=on_key_updown) as listener:
+    listener.join()
+"""
+
+while True:
+    clearscreen()
 
     board.printboard(legacy)
 
@@ -60,13 +101,19 @@ while True:
 
     try:
         if move == 'restart':
-            reset(board,time,turn)
+            board.restart()
+            time = [600, 600]
+            turn = True
+
             continue
 
         if move == 'legacy':
             print('Legacy')
             legacy = True
-            reset(board,time,turn)
+            board.restart()
+            time = [600, 600]
+            turn = True
+
             continue
 
         if move == 'save':
@@ -101,7 +148,7 @@ while True:
             continue
 
         makemove(move)
-    except: 
+    except:
         print("Invalid move!")
         sleep(1)
     else:
