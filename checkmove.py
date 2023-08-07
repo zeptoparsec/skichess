@@ -48,20 +48,19 @@ class Checkmove:
 
     def __check_bishop(self):
         iterate = abs(self.dx)
-        if abs(self.dx) == abs(self.dy):
-            if self.dy < 0:
-                for i in range(1, iterate):
-                    if self.dx > 0:
-                        if self.board[self.pos - i*8 + i].col != 'N': return False
-                    else:
-                        if self.board[self.pos - i*8 - i].col != 'N': return False
-            else:
-                for i in range(1, iterate):
-                    if self.dx > 0:
-                        if self.board[self.pos + i*8 + i].col != 'N': return False
-                    else:
-                        if self.board[self.pos + i*8 - i].col != 'N': return False
-        else: return False
+        if abs(self.dx) != abs(self.dy): return False
+        if self.dy < 0:
+            for i in range(1, iterate):
+                if self.dx > 0:
+                    if self.board[self.pos - i*8 + i].col != 'N': return False
+                else:
+                    if self.board[self.pos - i*8 - i].col != 'N': return False
+        else:
+            for i in range(1, iterate):
+                if self.dx > 0:
+                    if self.board[self.pos + i*8 + i].col != 'N': return False
+                else:
+                    if self.board[self.pos + i*8 - i].col != 'N': return False
         return True
 
     def __check_queen(self):
@@ -90,9 +89,25 @@ class Checkmove:
         return False
     
     def __check_castling(self):
-        return False
+        offset = 0 if self.board[self.pos].col == 'B' else 56
+        if self.type != 'K' or self.board[self.pos].moved: return False
+        if self.pos != 4 + offset: return False
+
+        if self.pos == 4 + offset:
+            if self.target == 1 + offset:
+                if self.board[0 + offset].moved: return False
+                for i in range(1, 4):
+                    if self.board[i + offset].col != 'N': return False
+            elif self.target == 6 + offset:
+                if self.board[7 + offset].moved: return False
+                for i in range(5, 7):
+                    if self.board[i + offset].col != 'N': return False
+            else: return False
+        return True
     
     def __check_enpassant(self):
+        # offset = 0 if self.board[self.pos].col == 'B' else 
+        # if 24 <= self.pos <= 31:
         return False
 
     def check(self, startpos, endpos):
