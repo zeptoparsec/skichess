@@ -5,4 +5,5 @@ class Piece:
         self.val = val
         self.col = col
         self.moved = False
+        seld.moved_again = False
         self.table = table
