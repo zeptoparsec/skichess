@@ -1,5 +1,7 @@
 from piece import Piece
 from checkmove import Checkmove
+from time import sleep
+from os import system, name
 
 class Boardstate:
     def __init__(self):
@@ -65,8 +67,16 @@ class Boardstate:
         if is_same_colour or is_empty_space or not is_correct_piece or move_type == False:
             self._movehistory = self._movehistory[0:len(self._movehistory)-5]
             return -1
-        elif move_type == "promotion": #not working
-            promo = input("Promote to: ").upper() #might wanna validate the input
+        elif move_type == "promotion":
+            while True: 
+                promo = input("Promote to: ").upper()
+                if promo in ['Q', 'B', 'N', 'R']: break
+
+                print("Invalid piece!")
+                sleep(1)
+                if name == 'nt': system('cls')
+                else: system('clear')
+                self.printboard(False)
     
             if self._board[endpos].col != 'N':
                 self._board[endpos] = self._board[startpos]
