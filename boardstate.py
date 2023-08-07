@@ -99,7 +99,7 @@ class Boardstate:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
         
         self._board[endpos].moved = True
-        if self._board[startpos].moved and self._board[startpos].name == 'P': 
+        if self._board[startpos].name == 'P' and self._board[startpos].moved : 
             self._board[startpos].moved_again = True
         self._movehistory += move+' '
         return 0 
