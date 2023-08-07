@@ -70,10 +70,10 @@ class Boardstate:
     
             if self._board[endpos].col != 'N':
                 self._board[endpos] = self._board[startpos]
-                self._board[startpos] = Piece('E',startpos,0,'N')
+                self._board[startpos] = Piece('E',startpos,0,'N',[])
             else:
                 self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
-            self._board[endpos].name == promo
+            self._board[endpos].name = promo
             
         elif move_type == "enpassant":
             #execute enpassant
@@ -84,7 +84,7 @@ class Boardstate:
             
         elif self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
-            self._board[startpos] = Piece('E',startpos,0,'N')
+            self._board[startpos] = Piece('E',startpos,0,'N',[])
         else:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
         
