@@ -80,13 +80,8 @@ class Checkmove:
 
     def __check_promotion(self):
         if not self.__check_pawn(): return False
-
-        if self.board[self.pos].col == 'B':
-            if 56 <= self.target <= 63: return True
-        else: 
-            if 0 <= self.target <= 7: return True
-
-        return False
+        offset = 0 if self.board[self.pos].col == 'W' else 56
+        return offset + 0 <= self.target <= offset + 7
     
     def __check_castling(self):
         offset = 0 if self.board[self.pos].col == 'B' else 56
