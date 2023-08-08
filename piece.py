@@ -5,5 +5,5 @@ class Piece:
         self.val = val
         self.col = col
         self.table = table
-        if name in ['R', 'K', 'P']: self.moved = False
+        if name in 'RKP': self.moved = False
         if name == 'P': self.moved_again = False
