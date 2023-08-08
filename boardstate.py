@@ -70,7 +70,7 @@ class Boardstate:
         elif move_type == "promotion":
             while True: 
                 promo = input("Promote to: ").upper()
-                if promo in ['Q', 'B', 'N', 'R']: break
+                if promo in 'QBNR': break
 
                 print("Invalid piece!")
                 sleep(1)
@@ -84,7 +84,8 @@ class Boardstate:
             else:
                 self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
             self._board[endpos].name = promo
-            
+            self._board[endpos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2 #wow thats long
+
         elif move_type == "enpassant":
             #execute enpassant
             pass
