@@ -110,3 +110,12 @@ class Boardstate:
 
     def loadGame(self, movehistory):
         self._movehistory = movehistory
+
+    def boardval(self):
+        res = 0
+        for i in self._board:
+            if i.col == 'W':
+                res += i.val
+            elif i.col == 'B':
+                res -= i.val
+        return res
