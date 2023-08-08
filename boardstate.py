@@ -56,6 +56,19 @@ class Boardstate:
     def restart(self):
         self.__init__()
 
+    def __move(self, startpos, endpos, move):
+        if self._board[endpos].col != 'N':
+            self._board[endpos] = self._board[startpos]
+            self._board[startpos] = Piece('E',startpos,0,'N',[])
+        else:
+            self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
+
+        self._board[endpos].moved = True
+        if self._board[startpos].name == 'P' and self._board[startpos].moved: 
+            self._board[startpos].moved_again = True
+
+        if move != None: self._movehistory += move+' '
+
     def makemove(self, startpos, endpos, turn, move):
         checkmove = Checkmove(self._board) # I don't want to do this...
     
@@ -78,31 +91,28 @@ class Boardstate:
                 else: system('clear')
                 self.printboard(False)
     
-            if self._board[endpos].col != 'N':
-                self._board[endpos] = self._board[startpos]
-                self._board[startpos] = Piece('E',startpos,0,'N',[])
-            else:
-                self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
+            self.__move(startpos, endpos, move)
             self._board[endpos].name = promo
             self._board[endpos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2 #wow thats long
+            return 0
 
         elif move_type == "enpassant":
             #execute enpassant
-            pass
+            return 0
         elif move_type == "castling":
-            #execute castling
-            pass
+            offset = 0 if self._board[startpos].col == 'B' else 56
+            self.__move(startpos, endpos, move)
+            move = None
+            if endpos == 1 + offset:
+                startpos = 0 + offset
+                endpos = 2 + offset
+            elif endpos == 6 + offset:
+                startpos = 7 + offset
+                endpos = 5 + offset
+            self.__move(startpos, endpos, move)
+            return 0
             
-        elif self._board[endpos].col != 'N':
-            self._board[endpos] = self._board[startpos]
-            self._board[startpos] = Piece('E',startpos,0,'N',[])
-        else:
-            self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
-        
-        self._board[endpos].moved = True
-        if self._board[startpos].name == 'P' and self._board[startpos].moved : 
-            self._board[startpos].moved_again = True
-        self._movehistory += move+' '
+        self.__move(startpos, endpos, move)
         return 0 
 
     def getMoveHistory(self):
