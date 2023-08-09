@@ -20,6 +20,7 @@ class Checkmove:
             if self.target == self.pos - (8 + 1) or self.target == self.pos - (8 - 1):
                 return self.board[self.target].col == 'B'
         return False
+        
 
     def __check_rook(self):
         if self.dy == 0:
@@ -67,7 +68,7 @@ class Checkmove:
         return self.__check_rook() or self.__check_bishop()
 
     def __check_king(self):
-        return self.dy in [-1,0,1] and self.dx in [-1,0,1]
+        return self.dy in [-1,0,1] and self.dx in [-1,0,1] and self.__check_check()
 
     def __check_piece(self):
         if self.type == 'P': return self.__check_pawn()
@@ -100,10 +101,25 @@ class Checkmove:
             else: return False
         return True
     
-    def __check_enpassant(self):
-        # offset = 0 if self.board[self.pos].col == 'B' else 
-        # if 24 <= self.pos <= 31:
-        return False
+    def __check_enpassant(self): #WIP
+        offset = 24 if self.board[self.pos].col == 'W' else 32
+        killpos = self.target + (8 if self.board[self.pos].col == 'W' else -8)
+        print("pos", killpos)
+        print("moved_again", self.board[killpos].moved_again)
+        if not((self.dx == 1 or self.dx == -1) and self.dy == (1 if self.board[self.pos].col == 'B' else -1)): return False
+        if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
+
+        return True
+    
+    def __check_check(self):
+        for i in range(64):
+            if self.board[i].name == 'K' or self.board[i].col == self.board[self.pos].col:
+                continue
+            cmove = Checkmove(self.board)#to avoid polluting the current Checkmove object
+            if cmove.check(i,self.target):
+                return False
+        return True
+                
 
     def check(self, startpos, endpos):
         self.pos = startpos
