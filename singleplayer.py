@@ -1,5 +1,8 @@
-class Pvp:
+class Singleplayer_menu:
     pass
 
-class Ai:
+class __Pvp:
+    pass
+
+class __Ai:
     pass
