@@ -56,7 +56,7 @@ class Boardstate:
     def restart(self):
         self.__init__()
 
-    def __move(self, startpos, endpos, move): #moved, moved_again bugged
+    def __move(self, startpos, endpos, move):
         if self._board[startpos].moved: self._board[startpos].moved_again = True
         else: self._board[startpos].moved = True
 
