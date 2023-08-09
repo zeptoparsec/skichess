@@ -101,14 +101,11 @@ class Checkmove:
             else: return False
         return True
     
-    def __check_enpassant(self): #WIP
+    def __check_enpassant(self):
         offset = 24 if self.board[self.pos].col == 'W' else 32
         killpos = self.target + (8 if self.board[self.pos].col == 'W' else -8)
-        print("pos", killpos)
-        print("moved_again", self.board[killpos].moved_again)
         if not((self.dx == 1 or self.dx == -1) and self.dy == (1 if self.board[self.pos].col == 'B' else -1)): return False
         if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
-
         return True
     
     def __check_check(self):
