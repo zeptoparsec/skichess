@@ -1,13 +1,15 @@
 from boardstate import Boardstate
+from singleplayer import Singleplayer_menu
+from multiplayer import Multiplayer_menu
 from os import system, name
 from time import sleep
 from datetime import datetime
 from pynput import keyboard
 from pynput.keyboard import Key
 
-
-
 board = Boardstate()
+simpleplayer = Singleplayer_menu()
+mulitplayer = Multiplayer_menu()
 
 x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
 y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
@@ -16,7 +18,7 @@ then = 0
 now = 0
 
 time = [600,600]
-inc = [1,1]
+inc = [1, 1]
 
 turn = True
 legacy = False
@@ -40,7 +42,7 @@ def menu():
     clearscreen()
     global pointer
 
-    print('Welcome to <nameless>!')
+    print('Welcome to Chess!')
     for i in range(len(options)):
         if i == pointer: print(end='>')
         else: print(end=' ')
@@ -50,10 +52,9 @@ def menu():
 # 1 - Mulitplayer
 # 2 - Exit
 def page(option): 
-    if option == 1: pass
-    elif option == 2: pass
+    if option == 0: pass
+    elif option == 1: pass
     elif option == 2: exit(0)
-
 
 def on_key_updown(key):
     global pointer
@@ -69,7 +70,7 @@ def on_key_updown(key):
 
 menu()
 
-with keyboard.Listener(on_release=on_key_updown) as listener:
+with keyboard.Listener(on_release = on_key_updown) as listener:
     listener.join()
 
 while True:
@@ -113,7 +114,6 @@ while True:
             clearscreen()
             file = open(input('Enter the filename to save the game in: '), 'w')
             file.write(board.getMoveHistory())
-
             continue
 
         if move == 'load':
@@ -135,3 +135,4 @@ while True:
         sleep(1)
     else:
         turn = not turn
+
