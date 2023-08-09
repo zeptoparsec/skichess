@@ -50,8 +50,8 @@ def menu():
 # 1 - Mulitplayer
 # 2 - Exit
 def page(option): 
-    if option == 1: 
-    elif option == 2:
+    if option == 1: pass
+    elif option == 2: pass
     elif option == 2: exit(0)
 
 
