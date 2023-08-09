@@ -56,21 +56,21 @@ class Boardstate:
     def restart(self):
         self.__init__()
 
-    def __move(self, startpos, endpos, move):
+    def __move(self, startpos, endpos, move): #moved, moved_again bugged
+        if self._board[startpos].moved: self._board[startpos].moved_again = True
+        else: self._board[startpos].moved = True
+
         if self._board[endpos].col != 'N':
             self._board[endpos] = self._board[startpos]
             self._board[startpos] = Piece('E',startpos,0,'N',[])
         else:
             self._board[startpos], self._board[endpos] = self._board[endpos], self._board[startpos]
 
-        self._board[endpos].moved = True
-        if self._board[startpos].name == 'P' and self._board[startpos].moved: 
-            self._board[startpos].moved_again = True
-
         if move != None: self._movehistory += move+' '
 
+
     def makemove(self, startpos, endpos, turn, move):
-        checkmove = Checkmove(self._board) # I don't want to do this...
+        checkmove = Checkmove(self._board)
     
         is_same_colour =  self._board[endpos].col == self._board[startpos].col
         is_empty_space = self._board[startpos].col == 'N'
@@ -83,7 +83,7 @@ class Boardstate:
         elif move_type == "promotion":
             while True: 
                 promo = input("Promote to: ").upper()
-                if promo in 'QBNR': break
+                if promo in "QBNR": break
 
                 print("Invalid piece!")
                 sleep(1)
@@ -93,22 +93,25 @@ class Boardstate:
     
             self.__move(startpos, endpos, move)
             self._board[endpos].name = promo
-            self._board[endpos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2 #wow thats long
+            self._board[endpos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2
             return 0
-
+            
         elif move_type == "enpassant":
             #execute enpassant
+            print("enp")
+            sleep(5)
             return 0
         elif move_type == "castling":
             offset = 0 if self._board[startpos].col == 'B' else 56
             self.__move(startpos, endpos, move)
+            move = None
             if endpos == 1 + offset:
                 startpos = 0 + offset
                 endpos = 2 + offset
             elif endpos == 6 + offset:
                 startpos = 7 + offset
                 endpos = 5 + offset
-            self.__move(startpos, endpos, None)
+            self.__move(startpos, endpos, move)
             return 0
             
         self.__move(startpos, endpos, move)
