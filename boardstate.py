@@ -69,7 +69,7 @@ class Boardstate:
         if move != None: self._movehistory += move+' '
 
 
-    def makemove(self, startpos, endpos, turn, move):
+    def makemove(self, startpos, endpos, turn, move, legacy):
         checkmove = Checkmove(self._board)
     
         is_same_colour =  self._board[endpos].col == self._board[startpos].col
@@ -89,7 +89,7 @@ class Boardstate:
                 sleep(1)
                 if name == 'nt': system('cls')
                 else: system('clear')
-                self.printboard(False)
+                self.printboard(legacy)
     
             self.__move(startpos, endpos, move)
             self._board[endpos].name = promo
