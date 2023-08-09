@@ -28,7 +28,7 @@ def makemove(move):
     endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
 
     is_valid_input = (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric()) == (len(move) == 4)
-    if not is_valid_input or board.makemove(startpos, endpos, turn, move) == -1: raise Exception
+    if not is_valid_input or board.makemove(startpos, endpos, turn, move, legacy) == -1: raise Exception
 
 def clearscreen():
     if name == 'nt':
