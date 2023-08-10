@@ -101,6 +101,7 @@ class Boardstate:
             self.__move(startpos, endpos, move)
             self._board[killpos] = Piece('E',startpos,0,'N',[])
             return 0
+
         elif move_type == "castling":
             offset = 0 if self._board[startpos].col == 'B' else 56
             self.__move(startpos, endpos, move)
@@ -112,6 +113,12 @@ class Boardstate:
                 endpos = 5 + offset
             self.__move(startpos, endpos, None)
             return 0
+
+        elif move_type == "illigal":
+            pass
+
+        elif move_type == "checkmate":
+            pass
             
         self.__move(startpos, endpos, move)
         return 0 
