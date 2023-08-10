@@ -12,6 +12,8 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Simple chess game')
 parser.add_argument('--legacy',action='store_true',default=False)
+parser.add_argument('-t',type=int,default=600)
+parser.add_argument('-i',type=int,default=0)
 
 args = parser.parse_args()
 
@@ -25,8 +27,8 @@ y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
 then = 0
 now = 0
 
-time = [600,600]
-inc = [1, 1]
+time = [args.t,args.t]
+inc = [args.i, args.i]
 
 turn = True
 legacy = args.legacy
@@ -78,8 +80,8 @@ def on_key_updown(key):
 
 menu()
 
-with keyboard.Listener(on_release = on_key_updown) as listener:
-    listener.join()
+#with keyboard.Listener(on_release = on_key_updown) as listener:
+#    listener.join()
 
 while True:
     clearscreen()
