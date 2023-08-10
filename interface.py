@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from boardstate import Boardstate
 from singleplayer import Singleplayer_menu
 from multiplayer import Multiplayer_menu
