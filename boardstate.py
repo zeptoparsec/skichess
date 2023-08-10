@@ -97,21 +97,20 @@ class Boardstate:
             return 0
             
         elif move_type == "enpassant":
-            #execute enpassant
-            print("enp")
-            sleep(5)
+            killpos = endpos + (8 if self._board[startpos].col == 'W' else -8)
+            self.__move(startpos, endpos, move)
+            self._board[killpos] = Piece('E',startpos,0,'N',[])
             return 0
         elif move_type == "castling":
             offset = 0 if self._board[startpos].col == 'B' else 56
             self.__move(startpos, endpos, move)
-            move = None
             if endpos == 1 + offset:
                 startpos = 0 + offset
                 endpos = 2 + offset
             elif endpos == 6 + offset:
                 startpos = 7 + offset
                 endpos = 5 + offset
-            self.__move(startpos, endpos, move)
+            self.__move(startpos, endpos, None)
             return 0
             
         self.__move(startpos, endpos, move)
