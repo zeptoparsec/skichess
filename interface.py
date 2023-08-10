@@ -34,8 +34,6 @@ inc = [args.i, args.i]
 turn = True
 legacy = args.legacy
 
-options = [' Single player',' Multiplayer',' Exit']
-
 def makemove(move):
     startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
     endpos = x_axis[move[2]] + y_axis[move[3]]*8 - 1
@@ -47,7 +45,7 @@ def clearscreen():
     if name == 'nt': system('cls')
     else: system('clear')
 
-def menu(options):
+def menu():
     pointer = 0
     options = [' Single player',' Multiplayer',' Exit']
 
@@ -81,7 +79,7 @@ def page(option):
     elif option == 1: pass
     elif option == 2: exit(0)
 
-menucp = menu(options)
+menucp = menu()
 
 def on_key_updown(key):
     if key == Key.up: menucp[1](-1)
