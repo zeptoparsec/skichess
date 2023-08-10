@@ -1,5 +1,5 @@
 class Multiplayer_menu:
     pass
 
-class __Mulitplayer:
+class __Multiplayer:
     pass

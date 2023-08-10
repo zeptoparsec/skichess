@@ -25,7 +25,7 @@ legacy = False
 
 pointer = 0
 
-options = [' Single player',' Mulitplayer',' Exit']
+options = [' Single player',' Multiplayer',' Exit']
 
 def makemove(move):
     startpos = x_axis[move[0]] + y_axis[move[1]]*8 - 1
