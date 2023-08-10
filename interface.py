@@ -34,8 +34,6 @@ inc = [args.i, args.i]
 turn = True
 legacy = args.legacy
 
-pointer = 0
-
 options = [' Single player',' Multiplayer',' Exit']
 
 def makemove(move):
@@ -49,15 +47,31 @@ def clearscreen():
     if name == 'nt': system('cls')
     else: system('clear')
 
-def menu():
-    clearscreen()
-    global pointer
+def menu(options):
+    pointer = 0
+    options = [' Single player',' Multiplayer',' Exit']
 
-    print('Welcome to Chess!')
-    for i in range(len(options)):
-        if i == pointer: print(end='>')
-        else: print(end=' ')
-        print(options[i])
+    def print_options():
+        clearscreen()
+
+        print('Welcome to Chess!')
+        for i in range(len(options)):
+            if i == pointer: print(end='>')
+            else: print(end=' ')
+            print(options[i])
+
+    def shift_pointer(shift):
+        nonlocal pointer
+
+        pointer = (pointer + shift) % len(options)
+
+        if pointer <= 0: pointer = 0
+        elif pointer >= len(options): pointer = len(options) - 1
+
+    def call_page():
+        page(pointer)
+
+    return [print_options, shift_pointer, call_page]
 
 # 0 - Single player
 # 1 - Mulitplayer
@@ -67,19 +81,16 @@ def page(option):
     elif option == 1: pass
     elif option == 2: exit(0)
 
+menucp = menu(options)
+
 def on_key_updown(key):
-    global pointer
+    if key == Key.up: menucp[1](-1)
+    elif key == Key.down: menucp[1](1)
+    elif key == Key.enter: menucp[2]()
 
-    if key == Key.up: pointer = (pointer - 1) % len(options)
-    elif key == Key.down: pointer = (pointer + 1) % len(options)
-    elif key == Key.enter: page(pointer)
+    menucp[0]()
 
-    if pointer <= 0: pointer = 0
-    elif pointer >= len(options): pointer = len(options) - 1
-
-    menu()
-
-menu()
+menucp[0]()
 
 if args.o == 2:
     with keyboard.Listener(on_release = on_key_updown) as listener:
