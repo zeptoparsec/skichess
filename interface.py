@@ -6,10 +6,16 @@ from time import sleep
 from datetime import datetime
 from pynput import keyboard
 from pynput.keyboard import Key
+import argparse
+
+parser = argparse.ArgumentParser(description='Simple chess game')
+parser.add_argument('--legacy',action='store_true',default=False)
+
+args = parser.parse_args()
 
 board = Boardstate()
 simpleplayer = Singleplayer_menu()
-mulitplayer = Multiplayer_menu()
+multiplayer = Multiplayer_menu()
 
 x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
 y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
@@ -21,7 +27,7 @@ time = [600,600]
 inc = [1, 1]
 
 turn = True
-legacy = False
+legacy = args.legacy
 
 pointer = 0
 
@@ -97,14 +103,6 @@ while True:
 
     try:
         if move == 'restart':
-            board.restart()
-            time = [600, 600]
-            turn = True
-            continue
-
-        if move == 'legacy':
-            print('Legacy')
-            legacy = True
             board.restart()
             time = [600, 600]
             turn = True
