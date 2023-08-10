@@ -2,7 +2,7 @@ class Checkmove:
     def __init__(self, board) -> None:
         self.board = board
 
-    def __check_pawn(self):
+    def __pawn(self):
         if self.board[self.pos].col == 'B': 
             if 15 >= self.pos >= 8:
                 if self.target == self.pos + (8) or self.target == self.pos + (8*2):
@@ -22,7 +22,7 @@ class Checkmove:
         return False
         
 
-    def __check_rook(self):
+    def __rook(self):
         if self.dy == 0:
             for i in range(1, abs(self.dx)):
                 if self.dx > 0:
@@ -38,7 +38,7 @@ class Checkmove:
         else: return False
         return True
     
-    def __check_knight(self):
+    def __knight(self):
         extr_top = self.target == self.pos + (8*2 - 1) or self.target == self.pos + (8*2 + 1)
         top = self.target == self.pos + (8 + 2) or self.target == self.pos + (8 - 2)
         bottom = self.target == self.pos - (8 + 2) or self.target == self.pos - (8 - 2)
@@ -47,7 +47,7 @@ class Checkmove:
         if extr_top or top or bottom or extr_bottom: return True
         else: return False
 
-    def __check_bishop(self):
+    def __bishop(self):
         iterate = abs(self.dx)
         if abs(self.dx) != abs(self.dy): return False
         if self.dy < 0:
@@ -64,27 +64,27 @@ class Checkmove:
                     if self.board[self.pos + i*8 - i].col != 'N': return False
         return True
 
-    def __check_queen(self):
-        return self.__check_rook() or self.__check_bishop()
+    def __queen(self):
+        return self.__rook() or self.__bishop()
 
-    def __check_king(self):
-        return self.dy in [-1,0,1] and self.dx in [-1,0,1] and self.__check_check()
+    def __king(self):
+        return self.dy in [-1,0,1] and self.dx in [-1,0,1] and self.__check()
 
-    def __check_piece(self):
-        if self.type == 'P': return self.__check_pawn()
-        elif self.type == 'R': return self.__check_rook()
-        elif self.type == 'N': return self.__check_knight()
-        elif self.type == 'B': return self.__check_bishop()
-        elif self.type == 'Q': return self.__check_queen()
-        elif self.type == 'K': return self.__check_king()
-        else: raise Exception('Unknown error in __check_piece')
+    def __piece(self):
+        if self.type == 'P': return self.__pawn()
+        elif self.type == 'R': return self.__rook()
+        elif self.type == 'N': return self.__knight()
+        elif self.type == 'B': return self.__bishop()
+        elif self.type == 'Q': return self.__queen()
+        elif self.type == 'K': return self.__king()
+        else: raise Exception('Unknown error in __piece')
 
-    def __check_promotion(self):
-        if not self.__check_pawn(): return False
+    def __promotion(self):
+        if not self.__pawn(): return False
         offset = 0 if self.board[self.pos].col == 'W' else 56
         return offset + 0 <= self.target <= offset + 7
     
-    def __check_castling(self):
+    def __castling(self):
         offset = 0 if self.board[self.pos].col == 'B' else 56
         if self.type != 'K' or self.board[self.pos].moved: return False
         if self.pos != 4 + offset: return False
@@ -101,14 +101,14 @@ class Checkmove:
             else: return False
         return True
     
-    def __check_enpassant(self):
+    def __enpassant(self):
         offset = 24 if self.board[self.pos].col == 'W' else 32
         killpos = self.target + (8 if self.board[self.pos].col == 'W' else -8)
         if not((self.dx == 1 or self.dx == -1) and self.dy == (1 if self.board[self.pos].col == 'B' else -1)): return False
         if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
         return True
     
-    def __check_check(self):
+    def __check(self):
         for i in range(64):
             if self.board[i].name == 'K' or self.board[i].col == self.board[self.pos].col:
                 continue
@@ -116,8 +116,10 @@ class Checkmove:
             if cmove.check(i,self.target):
                 return False
         return True
-                
 
+    def __checkmate(self):
+        return False
+                
     def check(self, startpos, endpos):
         self.pos = startpos
         self.target = endpos
@@ -125,8 +127,11 @@ class Checkmove:
         self.dy = self.target//8 - self.pos//8
         self.dx = self.target%8 - self.pos%8
 
-        if self.__check_promotion(): return "promotion"
-        elif self.__check_castling(): return "castling"
-        elif self.__check_enpassant(): return "enpassant"
+        if self.__promotion(): return_value = "promotion"
+        elif self.__castling(): return_value = "castling"
+        elif self.__enpassant(): return_value = "enpassant"
+        else: return_value = self.__piece()
 
-        return self.__check_piece()
+        if self.__checkmate(): return "checkmate"
+        elif self.__check(): return "illegal"
+        else: return return_value
