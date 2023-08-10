@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description='Simple chess game')
 parser.add_argument('--legacy',action='store_true',default=False)
 parser.add_argument('-t',type=int,default=600)
 parser.add_argument('-i',type=int,default=0)
+parser.add_argument('-o',type=int,default=2)
 
 args = parser.parse_args()
 
@@ -80,8 +81,11 @@ def on_key_updown(key):
 
 menu()
 
-#with keyboard.Listener(on_release = on_key_updown) as listener:
-#    listener.join()
+if args.o == 2:
+    with keyboard.Listener(on_release = on_key_updown) as listener:
+        listener.join()
+else:
+    page(args.o)
 
 while True:
     clearscreen()
