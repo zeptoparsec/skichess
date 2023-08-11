@@ -80,6 +80,7 @@ class Boardstate:
         if is_same_colour or is_empty_space or not is_correct_piece or move_type == False:
             self._movehistory = self._movehistory[0:len(self._movehistory)-5]
             return -1
+        
         elif move_type == "promotion":
             while True: 
                 promo = input("Promote to: ").upper()
@@ -114,7 +115,7 @@ class Boardstate:
             self.__move(startpos, endpos, None)
             return 0
 
-        elif move_type == "illigal":
+        elif move_type == "illegal":
             pass
 
         elif move_type == "checkmate":
