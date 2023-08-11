@@ -1,15 +1,15 @@
-from time import sleep
 from datetime import datetime
-from player import Player
-from os import system, name
-from boardstate import Boardstate
-from traceback import print_exc
+from os import name, system
 import random
+from time import sleep
+from boardstate import Boardstate
+from player import Player
 
 board = Boardstate()
 
 class Singleplayer_pvp:
-    def __init__(self,time,inc,turn,legacy):
+    
+    def __init__(self, time, inc, turn, legacy):
         self.x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
         self.y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
         self.then = 0
@@ -33,16 +33,27 @@ class Singleplayer_pvp:
         if not is_valid_input or board.makemove(startpos, endpos, self.turn, move, self.legacy) == -1: raise Exception
 
     def run(self):
+        board.restart()
+
         input()
-        p1 = Player(input("Player one: "), 'W', None)
-        p2 = Player(input("Player two: "), 'B', None)
+        self.clearscreen()
+        print("Chess pvp")
+
+        p1 = Player(input("Player one: "), random.choice(['W', 'B']), None)
+        p2 = Player(input("Player two: "), 'W' if p1.col == 'B' else 'B', None)
         then = now = 0
 
         while True:
             self.clearscreen()
+            print("Chess pvp")
+            print(p1.name + ":", "White" if p1.col == 'W' else "Black")
+            print(p2.name + ":", "White" if p2.col == 'W' else "Black")
+            print()
+
             board.printboard(self.legacy)
             self.time[int(not self.turn)] -= then - now - self.inc[int(not self.turn)]
 
+            print()
             print("Time spent:", then-now)
             print("Time left :", self.time[int(not self.turn)])
 
@@ -58,8 +69,8 @@ class Singleplayer_pvp:
 
             now = int(datetime.now().timestamp())
 
-            if self.turn: move = input(p1+"'s turn: ").lower()
-            else: move = input(p2+"'s turn: ").lower()
+            if self.turn: move = input("White's turn: ").lower()
+            else: move = input("Black's turn: ").lower()
             then = int(datetime.now().timestamp())
 
             try:
@@ -100,15 +111,8 @@ class Singleplayer_pvp:
 
                 self.makemove(move)
             except:
-                # print("Invalid move!")
-                # sleep(1)
-                print_exc()
-                exit()
+                print("Invalid move!")
+                sleep(1)
             else:
                 self.turn = not self.turn
         print("Press any key to continue")
-
-
-
-class __Ai:
-    pass
