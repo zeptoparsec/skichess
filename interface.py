@@ -2,10 +2,8 @@
 
 from boardstate import Boardstate
 from singleplayer import Singleplayer_pvp
-from multiplayer import Multiplayer_menu
+from multiplayer import Pvp_lan_menu
 from os import system, name
-from time import sleep
-from datetime import datetime
 from pynput import keyboard
 from pynput.keyboard import Key
 import argparse
@@ -20,7 +18,7 @@ args = parser.parse_args()
 
 board = Boardstate()
 singleplayer = Singleplayer_pvp([args.t,args.t],[args.i, args.i],True,args.legacy)
-multiplayer = Multiplayer_menu()
+multiplayer = Pvp_lan_menu()
 
 def clearscreen():
     if name == 'nt': system('cls')
@@ -29,15 +27,17 @@ def clearscreen():
 def menu():
     pointer = 0
     options = [' Single player',' Multiplayer',' Exit']
+    max_option_len = len(max(options))
 
     def print_options():
         clearscreen()
 
         print('Welcome to Chess!')
         for i in range(len(options)):
-            if i == pointer: print(end='>')
-            else: print(end=' ')
-            print(options[i])
+            print(end='>') if i == pointer else print(end=' ')
+            print(options[i], ' '*(max_option_len - len(options[i])),end = ' ')
+            print('<') if i == pointer else print()
+
 
     def shift_pointer(shift):
         nonlocal pointer
@@ -72,7 +72,7 @@ def on_key_updown(key):
 menucp[0]()
 
 if args.o == 2:
-    with keyboard.Listener(on_release = on_key_updown) as listener:
+    with keyboard.Listener(on_release=on_key_updown) as listener:
         listener.join()
 else:
     page(args.o)
