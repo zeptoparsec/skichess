@@ -108,9 +108,10 @@ class Checkmove:
         if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
         return True
     
+    
     def __check(self):
         for i in range(64):
-            if self.board[i].name == 'K' or self.board[i].col == self.board[self.pos].col:
+            if self.board[i].name == 'K' or self.board[i].col == self.board[self.pos].col or self.board[i].col == 'N':
                 continue
             cmove = Checkmove(self.board)#to avoid polluting the current Checkmove object
             if cmove.check(i,self.target):
@@ -132,6 +133,8 @@ class Checkmove:
         elif self.__enpassant(): return_value = "enpassant"
         else: return_value = self.__piece()
 
-        if self.__checkmate(): return "checkmate"
-        elif self.__check(): return "illegal"
-        else: return return_value
+        if self.type == 'K':
+            if self.__checkmate(): return "checkmate"
+            elif self.__check(): return "illegal"
+            else: return return_value
+    
