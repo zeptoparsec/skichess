@@ -1,67 +1,71 @@
-#!/usr/bin/env python3
-
 from pvp import Pvp
 from pvp_lan import Pvp_lan_menu
-from os import system, name
-from pynput import keyboard
-from pynput.keyboard import Key
-import argparse
+from pva import Pva
+from menu import Menu
 from time import sleep
+from os import listdir, getcwd
+import argparse
 
 parser = argparse.ArgumentParser(description='Simple chess game')
-parser.add_argument('-o',type=int,default=2)
+parser.add_argument('-t',type=int,default=600)
 args = parser.parse_args()
 
-def clearscreen():
-    if name == 'nt': system('cls')
-    else: system('clear')
+# menu tree
+curr_dir = 'Chess Engine'
+start_menu = Menu(curr_dir, ['Player vs Player', 'Player vs Ai', 'Exit'])
 
-def menu():
-    pointer = 0
-    options = [' Single player',' Multiplayer',' Exit']
+while True:
+    option = start_menu.run()
+    if option == 0: 
+        curr_dir += '/Player vs Player'
+        while True:
+            choice_pvp = Menu(curr_dir, ['New game', 'Load game', 'Lan game', 'Back'])
+            option = choice_pvp.run()
 
-    def print_options():
-        clearscreen()
+            if option == 0: 
+                Pvp([args.t, args.t], True, False).run()
+                sleep(1)
 
-        print('Welcome to Chess!')
-        for i in range(len(options)):
-            print(end='>') if i == pointer else print(end=' ')
-            print(options[i], ' '*(len(max(options)) - len(options[i])),end='')
-            print('<') if i == pointer else print()
+            elif option == 1:
+                curr_dir += '/Load game'
+                while True:
+                    load_menu = Menu(curr_dir, ['Play', 'Delete', 'Back'])
+                    option = load_menu.run()
 
+                    if option == 0:
+                        curr_dir += '/Play'
+                        while True:
+                            cache_files = listdir(getcwd() + "//cache//")
+                            cache_files.append('Back')
 
-    def shift_pointer(shift):
-        nonlocal pointer
+                            load_game = Menu(curr_dir, cache_files)
+                            option = load_game.run()
 
-        pointer = (pointer + shift) % len(options)
+                            if cache_files[option] != 'Back': 
+                                Pvp([args.t, args.t], True, cache_files[option]).run()
+                                sleep(1)
 
-        if pointer <= 0: pointer = 0
-        elif pointer >= len(options): pointer = len(options) - 1
+                            elif cache_files[option] == 'Back': 
+                                curr_dir = curr_dir.removesuffix('/Play')
+                                break
 
-    def call_page():
-        page(pointer)
+                    elif option == 1:
+                        pass #Delete selected file
 
-    return [print_options, shift_pointer, call_page]
+                    elif option == 2:
+                        curr_dir = curr_dir.removesuffix('/Load game')
+                        break
 
-# 0 - Single player
-# 1 - Mulitplayer
-# 2 - Exit
-def page(option): 
-    if option == 0: Pvp().run()
-    elif option == 1: Pvp_lan_menu().run()
+            elif option == 2: 
+                Pvp_lan_menu().run()
+                sleep(1)
+
+            elif option == 3: 
+                curr_dir = curr_dir.removesuffix('/Player vs Player')
+                break
+
+    elif option == 1: 
+        Pva().run()
+        sleep(1)
+
     elif option == 2: exit()
-    sleep(0.5)
-
-menucp = menu()
-menucp[0]()
-
-def on_key_updown(key):
-    if key == Key.up: menucp[1](-1)
-    elif key == Key.down: menucp[1](1)
-    elif key == Key.enter: menucp[2]()
-    menucp[0]()
-
-if args.o == 2:
-    with keyboard.Listener(on_release=on_key_updown) as listener:
-        listener.join()
-else: page(args.o)

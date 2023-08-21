@@ -1,12 +1,12 @@
-from time import sleep
-
 class Pvp_lan_menu:
     
     def run(self):
         print("Work in progress!")
-        sleep(3)
-        return
+        return None
 
 
-class __pvp_lan:
+class __Client:
+    pass
+
+class __Server:
     pass
