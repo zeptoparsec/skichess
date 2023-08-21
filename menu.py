@@ -1,6 +1,8 @@
 from pynput.keyboard import Key, Listener
 from os import system, name
 
+from time import sleep
+
 class Menu:
     def __init__(self, title, options):
         self.options = options
@@ -45,6 +47,7 @@ class Menu:
 
     def run(self):
         self.menucp[0]()
+        sleep(0.1)
         with Listener(on_release=self.__on_key_updown) as listener:
             listener.join()
         return self.menucp[2]()
