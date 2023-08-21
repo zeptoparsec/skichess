@@ -1,6 +1,5 @@
 from pynput.keyboard import Key, Listener
 from os import system, name
-
 from time import sleep
 
 class Menu:
