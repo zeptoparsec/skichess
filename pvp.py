@@ -32,7 +32,7 @@ class Pvp:
         if not is_valid_input or board.makemove(startpos, endpos, self.turn, move, self.legacy) == -1: raise Exception
 
     def __load_game(self):
-        game = open(getcwd() + "//cache//" + self.load,'r').read().split()
+        game = open(getcwd() + "\\cache\\" + self.load,'r').read().split()
         self.turn = bool(game[-7])
         self.time = [int(game[-6]), int(game[-5])]
         self.p1 = Player(game[-4], game[-3], None)
@@ -112,7 +112,7 @@ class Pvp:
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise Exception
 
-                    file = open(getcwd() + "//cache//" + move[5:].lstrip(), 'w')
+                    file = open(getcwd() + "\\cache\\" + move[5:].lstrip(), 'w')
                     lines = [board.getMoveHistory(),
                             str(self.turn) + ' ',
                             str(self.time[0]) + ' ',
