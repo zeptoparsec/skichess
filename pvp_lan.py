@@ -2,7 +2,7 @@ class Pvp_lan_menu:
     
     def run(self):
         print("Work in progress!")
-        return None
+        return
 
 
 class __Client:

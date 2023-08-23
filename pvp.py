@@ -1,5 +1,5 @@
 from datetime import datetime
-from os import name, system, getcwd
+from os import name, system, path
 import random
 from time import sleep
 from boardstate import Boardstate
@@ -9,7 +9,7 @@ board = Boardstate()
 
 class Pvp:
     
-    def __init__(self, time, turn, load):
+    def __init__(self, time, turn, load, legacy):
         self.x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
         self.y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
         self.then = 0
@@ -17,7 +17,7 @@ class Pvp:
         self.time = time
         self.inc = [0, 0]
         self.turn = turn
-        self.legacy = False
+        self.legacy = legacy
         self.load = load
         
     def __clearscreen(self):
@@ -32,19 +32,24 @@ class Pvp:
         if not is_valid_input or board.makemove(startpos, endpos, self.turn, move, self.legacy) == -1: raise Exception
 
     def __load_game(self):
-        game = open(getcwd() + "\\cache\\" + self.load,'r').read().split()
+        game = open(path.dirname(path.abspath(__file__)) + "\\cache\\games\\" + self.load,'r').read().split()
         self.turn = bool(game[-7])
         self.time = [int(game[-6]), int(game[-5])]
-        self.p1 = Player(game[-4], game[-3], None)
-        self.p2 = Player(game[-2], game[-1], None)
+        self.p1 = Player(game[-3], game[-4], None)
+        self.p2 = Player(game[-1], game[-2], None)
         del game[-7:]
 
         for i in game:
             self.__makemove(i)
             self.turn = not self.turn
 
-        board.loadGame(game)
+        board.loadGame(' '.join([str(i) for i in game]) + ' ')
 
+    def __validate_name(self):
+        if self.p1.name == '': self.p1.name = '-'
+        if self.p2.name == '': self.p2.name = '-'
+        self.p1.name.replace(' ', '_')
+        self.p2.name.replace(' ', '_')
 
     def run(self):
         self.__clearscreen()
@@ -53,6 +58,8 @@ class Pvp:
         if self.load == False:
             self.p1 = Player(input("Player one: "), random.choice(['W', 'B']), None)
             self.p2 = Player(input("Player two: "), 'W' if self.p1.col == 'B' else 'B', None)
+            self.__validate_name()
+
         else: self.__load_game()
 
         then = now = 0
@@ -68,7 +75,7 @@ class Pvp:
 
             print()
             print("Commands:")
-            print(" back\n restart\n legacy\n save: <file name>\n <move>: eg - b1a3")
+            print(" back\n restart\n save: <file name>\n <move>: eg - b1a3")
 
             self.time[int(not self.turn)] -= then - now - self.inc[int(not self.turn)]
 
@@ -105,14 +112,10 @@ class Pvp:
                     self.turn = True
                     continue
 
-                if move == 'legacy':
-                    self.legacy = not self.legacy
-                    continue
-
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise Exception
 
-                    file = open(getcwd() + "\\cache\\" + move[5:].lstrip(), 'w')
+                    file = open(path.dirname(path.abspath(__file__)) + "\\cache\\games\\" + move[5:].lstrip(), 'w')
                     lines = [board.getMoveHistory(),
                             str(self.turn) + ' ',
                             str(self.time[0]) + ' ',
@@ -124,6 +127,8 @@ class Pvp:
                     ]
                     file.writelines(lines)
                     file.close()
+
+                    board.restart()
                     return
 
                 self.__makemove(move)
