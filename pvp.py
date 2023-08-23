@@ -48,8 +48,8 @@ class Pvp:
     def __validate_name(self):
         if self.p1.name == '': self.p1.name = '-'
         if self.p2.name == '': self.p2.name = '-'
-        self.p1.name.replace(' ', '_')
-        self.p2.name.replace(' ', '_')
+        self.p1.name = self.p1.name.replace(' ', '_')
+        self.p2.name = self.p2.name.replace(' ', '_')
 
     def run(self):
         self.__clearscreen()
@@ -58,12 +58,10 @@ class Pvp:
         if self.load == False:
             self.p1 = Player(input("Player one: "), random.choice(['W', 'B']), None)
             self.p2 = Player(input("Player two: "), 'W' if self.p1.col == 'B' else 'B', None)
-            self.__validate_name()
-
         else: self.__load_game()
 
+        self.__validate_name()
         then = now = 0
-
         while True:
             self.__clearscreen()
             print("Chess pvp")
