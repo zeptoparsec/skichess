@@ -5,20 +5,21 @@ from menu import Menu
 from time import sleep
 from os import listdir, path, remove
 import argparse
+import json
 
 parser = argparse.ArgumentParser(description='Simple chess game')
 parser.add_argument('-t',type=int,default=600)
 args = parser.parse_args()
 
 def load_settings():
-    settings_file = open(path.dirname(path.abspath(__file__)) + "\\cache\\settings.txt",'r').read().split()
-    return {'legacy': eval(settings_file[0])}
+    settings = open(path.dirname(path.abspath(__file__)) + "/settings.json",'r').read()
+    return json.loads(settings)
 
 active_settings = load_settings()
 
 # menu tree
 curr_dir = 'Chess Engine'
-start_menu = Menu(curr_dir, ['Player vs Player', 'Player vs Ai', 'Settings', 'Exit'])
+start_menu = Menu(curr_dir, ['Player vs Player', 'Player vs Ai', 'Exit'])
 
 while True:
     option = start_menu.run()
@@ -79,19 +80,4 @@ while True:
         Pva().run()
         sleep(1)
 
-    elif option == 2:
-        curr_dir += '\\Settings'
-        while True:
-            settings = open(path.dirname(path.abspath(__file__)) + "\\cache\\settings.txt",'r').read().split()
-            settings_menu = Menu(curr_dir, ['Legacy: ' + ('Enabled' if eval(settings[0]) else 'Disabled'), 'Back'])
-            option = settings_menu.run()
-            if option == 0:
-                active_settings['legacy'] = not eval(settings[0])
-                file = open(path.dirname(path.abspath(__file__)) + "\\cache\\settings.txt", 'w')
-                file.writelines([str(active_settings['legacy'])])
-                file.close()
-
-            elif option == 1:
-                curr_dir = curr_dir[:-9]
-                break
-    elif option == 3: exit()
+    elif option == 2: break
