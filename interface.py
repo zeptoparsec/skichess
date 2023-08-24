@@ -18,13 +18,15 @@ def load_settings():
 active_settings = load_settings()
 
 # menu tree
-curr_dir = 'Chess Engine'
+curr_dir = '''
+ _   _           _              ____                _                   _   _\n| | | |_ __   __| | ___ _ __   / ___|___  _ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __\n| | | | '_ \\ / _` |/ _ \\ '__| | |   / _ \\| '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ \n| |_| | | | | (_| |  __/ |    | |__| (_) | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |\n \\___/|_| |_|\\__,_|\\___|_|     \\____\\___/|_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|\n
+Chess Engine'''
 start_menu = Menu(curr_dir, ['Player vs Player', 'Player vs Ai', 'Exit'])
 
 while True:
     option = start_menu.run()
     if option == 0: 
-        curr_dir += '\\Player vs Player'
+        curr_dir += ' -> Player vs Player'
         while True:
             choice_pvp = Menu(curr_dir, ['New game', 'Saved game', 'Lan game', 'Back'])
             option = choice_pvp.run()
@@ -34,14 +36,14 @@ while True:
                 sleep(1)
 
             elif option == 1:
-                curr_dir += '\\Saved game'
+                curr_dir += ' -> Saved game'
                 while True:
                     load_menu = Menu(curr_dir, ['Play', 'Delete', 'Back'])
                     option = load_menu.run()
 
                     if option in [0, 1]:
                         delete = False if option == 0 else True
-                        curr_dir += '\\Play' if option == 0 else '\\Delete'
+                        curr_dir += ' -> Play' if option == 0 else ' -> Delete'
                         
                         while True:
                             cache_path = path.dirname(path.abspath(__file__)) + "\\cache\\games\\"
