@@ -46,8 +46,8 @@ while True:
                         curr_dir += ' -> Play' if option == 0 else ' -> Delete'
                         
                         while True:
-                            cache_path = path.dirname(path.abspath(__file__)) + "\\cache\\games\\"
-                            cache_files = [i.title() for i in listdir(cache_path)]
+                            cache_path = path.dirname(path.abspath(__file__)) + "/cache/games"
+                            cache_files = [i for i in listdir(cache_path)]
                             cache_files.append('Back')
 
                             load_game = Menu(curr_dir, cache_files)
