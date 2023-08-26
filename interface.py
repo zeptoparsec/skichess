@@ -18,9 +18,7 @@ def load_settings():
 active_settings = load_settings()
 
 # menu tree
-curr_dir = '''
- _   _           _              ____                _                   _   _\n| | | |_ __   __| | ___ _ __   / ___|___  _ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __\n| | | | '_ \\ / _` |/ _ \\ '__| | |   / _ \\| '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ \n| |_| | | | | (_| |  __/ |    | |__| (_) | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |\n \\___/|_| |_|\\__,_|\\___|_|     \\____\\___/|_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|\n
-Chess Engine'''
+curr_dir = 'Chess Engine'
 start_menu = Menu(curr_dir, ['Player vs Player', 'Player vs Ai', 'Exit'])
 
 while True:
