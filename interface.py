@@ -61,11 +61,11 @@ while True:
                                     continue
 
                             else: 
-                                curr_dir = curr_dir[:(-7 if delete else -5)]
+                                curr_dir = curr_dir[:(-10 if delete else -8)]
                                 break
 
                     elif option == 2:
-                        curr_dir = curr_dir[:-11]
+                        curr_dir = curr_dir[:-14]
                         break
 
             elif option == 2: 
@@ -73,7 +73,7 @@ while True:
                 sleep(1)
 
             elif option == 3: 
-                curr_dir = curr_dir[:-17]
+                curr_dir = curr_dir[:-20]
                 break
 
     elif option == 1: 

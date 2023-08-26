@@ -76,7 +76,6 @@ class Boardstate:
         is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
     
         if is_same_colour or is_empty_space or not is_correct_piece:
-            self._movehistory = self._movehistory[0:len(self._movehistory)-5]
             if is_empty_space: raise EmptyBox
             elif not is_correct_piece: raise OpponentsPiece
             elif is_same_colour: raise CaptureOwnPiece
