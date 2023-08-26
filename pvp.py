@@ -33,7 +33,7 @@ class Pvp:
         board.makemove(startpos, endpos, self.turn, move)
 
     def __load_game(self):
-        game = open(path.dirname(path.abspath(__file__)) + "\\cache\\games\\" + self.load,'r').read().split()
+        game = open(path.dirname(path.abspath(__file__)) + "/cache/games/" + self.load,'r').read().split()
         self.turn = bool(game[-7])
         self.time = [int(game[-6]), int(game[-5])]
         self.p1 = Player(game[-3], game[-4], None)
