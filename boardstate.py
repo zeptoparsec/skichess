@@ -1,7 +1,6 @@
+from errors import *
 from piece import Piece
 from checkmove import Checkmove
-from time import sleep
-from os import system, name
 
 class Boardstate:
     def __init__(self):
@@ -69,39 +68,34 @@ class Boardstate:
         if move != None: self._movehistory += move+' '
 
 
-    def makemove(self, startpos, endpos, turn, move, legacy):
+    def makemove(self, startpos, endpos, turn, move):
         checkmove = Checkmove(self._board)
     
         is_same_colour =  self._board[endpos].col == self._board[startpos].col
         is_empty_space = self._board[startpos].col == 'N'
-        move_type = checkmove.check(startpos, endpos)
         is_correct_piece = True if turn == (self._board[startpos].col == 'W') else False
     
-        if is_same_colour or is_empty_space or not is_correct_piece or move_type == False:
+        if is_same_colour or is_empty_space or not is_correct_piece:
             self._movehistory = self._movehistory[0:len(self._movehistory)-5]
-            return -1
-        
-        elif move_type == "promotion":
-            while True: 
-                promo = input("Promote to: ").upper()
-                if promo in "QBNR": break
+            if is_empty_space: raise EmptyBox
+            elif not is_correct_piece: raise OpponentsPiece
+            elif is_same_colour: raise CaptureOwnPiece
 
-                print("Invalid piece!")
-                sleep(1)
-                if name == 'nt': system('cls')
-                else: system('clear')
-                self.printboard(legacy)
+        move_type = checkmove.check(startpos, endpos)
+        if move_type == "promotion":
+            promo = input("Promote to: ").upper()
+            if promo not in "QBNR": raise InvalidPromotionInput
     
             self.__move(startpos, endpos, move)
             self._board[endpos].name = promo
             self._board[endpos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2
-            return 0
+            return
             
         elif move_type == "enpassant":
             killpos = endpos + (8 if self._board[startpos].col == 'W' else -8)
             self.__move(startpos, endpos, move)
             self._board[killpos] = Piece('E',startpos,0,'N',[])
-            return 0
+            return
 
         elif move_type == "castling":
             offset = 0 if self._board[startpos].col == 'B' else 56
@@ -113,16 +107,13 @@ class Boardstate:
                 startpos = 7 + offset
                 endpos = 5 + offset
             self.__move(startpos, endpos, None)
-            return 0
-
-        elif move_type == "illegal":
-            pass
+            return
 
         elif move_type == "checkmate":
             pass
             
         self.__move(startpos, endpos, move)
-        return 0 
+        return
 
     def getMoveHistory(self):
         return self._movehistory

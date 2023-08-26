@@ -4,6 +4,7 @@ import random
 from time import sleep
 from boardstate import Boardstate
 from player import Player
+from errors import *
 
 board = Boardstate()
 
@@ -28,8 +29,8 @@ class Pvp:
         startpos = self.x_axis[move[0]] + self.y_axis[move[1]]*8 - 1
         endpos = self.x_axis[move[2]] + self.y_axis[move[3]]*8 - 1
 
-        is_valid_input = (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric()) == (len(move) == 4)
-        if not is_valid_input or board.makemove(startpos, endpos, self.turn, move, self.legacy) == -1: raise Exception
+        if not (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric() and len(move) == 4): raise Exception
+        board.makemove(startpos, endpos, self.turn, move)
 
     def __load_game(self):
         game = open(path.dirname(path.abspath(__file__)) + "\\cache\\games\\" + self.load,'r').read().split()
@@ -111,7 +112,7 @@ class Pvp:
                     continue
 
                 if move.__contains__('save:'): 
-                    if len(move) == 5: raise Exception
+                    if len(move) == 5: raise UnNamedFile
 
                     file = open(path.dirname(path.abspath(__file__)) + "\\cache\\games\\" + move[5:].lstrip(), 'w')
                     lines = [board.getMoveHistory(),
@@ -130,10 +131,19 @@ class Pvp:
                     return
 
                 self.__makemove(move)
-            except:
-                print("Invalid move!")
-                sleep(1)
-            else: self.turn = not self.turn
+
+            except InvalidMove as e: print("Invalid Move:", e, "cannot move there")
+            except IllegalMove: print("Check!")
+            except OpponentsPiece: print("Cannot move opponent's piece")
+            except EmptyBox: print("There is no piece there")
+            except CaptureOwnPiece: print("Cannot capture your own piece")
+            except UnNamedFile: print("File name is required")
+            except InvalidPromotionInput:print("Invalid piece: Use Q, B, N, R")
+            except Exception: print("Invalid Input!")
+            else: 
+                self.turn = not self.turn
+                continue
+            sleep(3)
 
         board.restart()
         del self.p1, self.p2

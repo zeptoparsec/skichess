@@ -1,3 +1,5 @@
+from errors import InvalidMove, IllegalMove
+
 class Checkmove:
     def __init__(self, board) -> None:
         self.board = board
@@ -39,10 +41,10 @@ class Checkmove:
         return True
     
     def __knight(self):
-        extr_top = self.target == self.pos + (8*2 - 1) or self.target == self.pos + (8*2 + 1)
-        top = self.target == self.pos + (8 + 2) or self.target == self.pos + (8 - 2)
-        bottom = self.target == self.pos - (8 + 2) or self.target == self.pos - (8 - 2)
-        extr_bottom = self.target == self.pos - (8*2 - 1) or self.target == self.pos - (8*2 + 1)
+        extr_top = (self.target == self.pos - (8*2 - 1)) or (self.target == self.pos - (8*2 + 1))
+        top = (self.target == self.pos - (8 + 2)) or (self.target == self.pos - (8 - 2))
+        bottom = (self.target == self.pos + (8 + 2)) or (self.target == self.pos + (8 - 2))
+        extr_bottom = (self.target == self.pos + (8*2 - 1)) or (self.target == self.pos + (8*2 + 1))
 
         if extr_top or top or bottom or extr_bottom: return True
         else: return False
@@ -71,12 +73,18 @@ class Checkmove:
         return self.dy in [-1,0,1] and self.dx in [-1,0,1]
 
     def __piece(self):
-        if self.type == 'P': return self.__pawn()
-        elif self.type == 'R': return self.__rook()
-        elif self.type == 'N': return self.__knight()
-        elif self.type == 'B': return self.__bishop()
-        elif self.type == 'Q': return self.__queen()
-        elif self.type == 'K': return self.__king()
+        if self.type == 'P': 
+            if not self.__pawn(): raise InvalidMove("pawn")
+        elif self.type == 'R': 
+            if not self.__rook(): raise InvalidMove("rook")
+        elif self.type == 'N': 
+            if not self.__knight(): raise InvalidMove("knight")
+        elif self.type == 'B': 
+            if not self.__bishop(): raise InvalidMove("bishop")
+        elif self.type == 'Q': 
+            if not self.__queen(): raise InvalidMove("queen")
+        elif self.type == 'K': 
+            if not self.__king(): raise InvalidMove("king")
         else: raise Exception('Unknown error in __piece')
 
     def __promotion(self):
@@ -104,6 +112,7 @@ class Checkmove:
     def __enpassant(self):
         offset = 24 if self.board[self.pos].col == 'W' else 32
         killpos = self.target + (8 if self.board[self.pos].col == 'W' else -8)
+        if self.board[killpos].col != 'N': return False
         if not((self.dx == 1 or self.dx == -1) and self.dy == (1 if self.board[self.pos].col == 'B' else -1)): return False
         if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
         return True
@@ -118,31 +127,37 @@ class Checkmove:
     #             return False
     #     return True
 
+    def __checkbounds(self, index):
+        if index < 0 or index > 63: raise IndexError("Out of range")
+        else: return index
+
     def __check(self, col):
-        return False
         kingpos = 0
         for i in range(64):
             if self.board[i].name == 'K' and self.board[i].col == col:
                 kingpos = i
                 break
+
         #check knight threat
-        n = 2
-        for i in range(1, 3):
-            if self.board[kingpos - (8*i + n)].col != col:
-                if self.board[kingpos - (8*i + n)].name == 'N': return True 
-            elif self.board[kingpos - (8*i - n)].col != col:
-                if self.board[kingpos - (8*i - n)].name == 'N': return True  
-            elif self.board[kingpos + (8*i + n)].col != col:
-                if self.board[kingpos + (8*i + n)].name == 'N': return True 
-            elif self.board[kingpos + (8*i - n)].col != col:
-                if self.board[kingpos + (8*i - n)].name == 'N': return True 
-            n = 1
+        try: extr_top = (self.board[self.__checkbounds(kingpos - (8*2 - 1))].name == 'N' and self.board[self.__checkbounds(kingpos - (8*2 - 1))].col != col) or (self.board[self.__checkbounds(kingpos - (8*2 + 1))].name == 'N' and self.board[self.__checkbounds(kingpos - (8*2 + 1))].col != col)
+        except IndexError: extr_top = False
+        try: top = (self.board[self.__checkbounds(kingpos - (8 + 2))].name == 'N' and self.board[self.__checkbounds(kingpos - (8 + 2))].col != col) or (self.board[self.__checkbounds(kingpos - (8 - 2))].name == 'N' and self.board[self.__checkbounds(kingpos - (8 - 2))].col != col)
+        except IndexError: top = False
+        try: bottom = (self.board[self.__checkbounds(kingpos + (8 + 2))].name == 'N' and self.board[self.__checkbounds(kingpos + (8 + 2))].col != col) or (self.board[self.__checkbounds(kingpos + (8 - 2))].name == 'N' and self.board[self.__checkbounds(kingpos + (8 - 2))].col != col)
+        except IndexError: bottom = False
+        try: extr_bottom = (self.board[self.__checkbounds(kingpos + (8*2 - 1))].name == 'N' and self.board[self.__checkbounds(kingpos + (8*2 - 1))].col != col) or (self.board[self.__checkbounds(kingpos + (8*2 + 1))].name == 'N' and self.board[self.__checkbounds(kingpos + (8*2 + 1))].col != col)
+        except IndexError: extr_bottom = False
+
+        if extr_top or top or bottom or extr_bottom: return True
 
         #check down threat
 
         return False
 
     def __checkmate(self):
+        return False
+
+    def __stalemate(self):
         return False
                 
     def check(self, startpos, endpos):
@@ -158,6 +173,7 @@ class Checkmove:
         else: return_value = self.__piece()
 
         if self.__checkmate(): return "checkmate"
-        elif self.__check(self.board[startpos].col): return "illegal"
+        elif self.__stalemate(): return "stalemate"
+        elif self.__check(self.board[startpos].col): raise IllegalMove
         else: return return_value
     
