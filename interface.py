@@ -12,31 +12,36 @@ parser.add_argument('-t',type=int,default=600)
 args = parser.parse_args()
 
 def load_settings():
-    settings = open(path.dirname(path.abspath(__file__)) + "/settings.json",'r').read()
+    settings = open(path.dirname(path.abspath(__file__)) + "/cache/settings.json",'r').read()
     return json.loads(settings)
+
+def update_settings(updates):
+    with open(path.dirname(path.abspath(__file__)) + '/cache/settings.json','r+') as file:
+        file.seek(0)
+        json.dump(updates, file, indent=4)
+        file.truncate()
 
 active_settings = load_settings()
 
 # menu tree
 curr_dir = 'Chess Engine'
-start_menu = Menu(curr_dir, ['Player vs Player', 'Player vs Ai', 'Exit'])
+start_menu = Menu(curr_dir, ['Player vs Player', 'Player vs Ai', 'Settings', 'Exit'])
 
 while True:
     option = start_menu.run()
     if option == 0: 
         curr_dir += ' -> Player vs Player'
+        choice_pvp = Menu(curr_dir, ['New game', 'Saved game', 'Lan game', 'Back'])
         while True:
-            choice_pvp = Menu(curr_dir, ['New game', 'Saved game', 'Lan game', 'Back'])
             option = choice_pvp.run()
-
             if option == 0: 
                 Pvp([args.t, args.t], True, False, active_settings['legacy']).run()
                 sleep(1)
 
             elif option == 1:
                 curr_dir += ' -> Saved game'
+                load_menu = Menu(curr_dir, ['Play', 'Delete', 'Back'])
                 while True:
-                    load_menu = Menu(curr_dir, ['Play', 'Delete', 'Back'])
                     option = load_menu.run()
 
                     if option in [0, 1]:
@@ -80,4 +85,19 @@ while True:
         Pva().run()
         sleep(1)
 
-    elif option == 2: break
+    elif option == 2: 
+        curr_dir += ' -> Settings'
+        while True:
+            settings_menu = Menu(curr_dir, ['Legacy: ' + ('Enabled' if active_settings['legacy'] else 'Disabled'), 
+                                'Back'])
+
+            option = settings_menu.run()
+            if option == 0:
+                active_settings['legacy'] = not active_settings['legacy']
+                update_settings(active_settings)
+
+            elif option == 1:
+                curr_dir = curr_dir[:-12]
+                break
+
+    elif option == 3: break
