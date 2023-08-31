@@ -132,6 +132,7 @@ class Checkmove:
         else: return index
 
     def __check(self, col):
+        #To-do update the board
         kingpos = 0
         for i in range(64):
             if self.board[i].name == 'K' and self.board[i].col == col:
@@ -139,16 +140,24 @@ class Checkmove:
                 break
 
         #check knight threat
-        try: extr_top = (self.board[self.__checkbounds(kingpos - (8*2 - 1))].name == 'N' and self.board[self.__checkbounds(kingpos - (8*2 - 1))].col != col) or (self.board[self.__checkbounds(kingpos - (8*2 + 1))].name == 'N' and self.board[self.__checkbounds(kingpos - (8*2 + 1))].col != col)
-        except IndexError: extr_top = False
-        try: top = (self.board[self.__checkbounds(kingpos - (8 + 2))].name == 'N' and self.board[self.__checkbounds(kingpos - (8 + 2))].col != col) or (self.board[self.__checkbounds(kingpos - (8 - 2))].name == 'N' and self.board[self.__checkbounds(kingpos - (8 - 2))].col != col)
-        except IndexError: top = False
-        try: bottom = (self.board[self.__checkbounds(kingpos + (8 + 2))].name == 'N' and self.board[self.__checkbounds(kingpos + (8 + 2))].col != col) or (self.board[self.__checkbounds(kingpos + (8 - 2))].name == 'N' and self.board[self.__checkbounds(kingpos + (8 - 2))].col != col)
-        except IndexError: bottom = False
-        try: extr_bottom = (self.board[self.__checkbounds(kingpos + (8*2 - 1))].name == 'N' and self.board[self.__checkbounds(kingpos + (8*2 - 1))].col != col) or (self.board[self.__checkbounds(kingpos + (8*2 + 1))].name == 'N' and self.board[self.__checkbounds(kingpos + (8*2 + 1))].col != col)
-        except IndexError: extr_bottom = False
+        try: extr_top_left = self.board[self.__checkbounds(kingpos - (8*2 - 1))].name == 'N' and self.board[self.__checkbounds(kingpos - (8*2 - 1))].col != col
+        except IndexError: extr_top_left = False
+        try: extr_top_right = self.board[self.__checkbounds(kingpos - (8*2 + 1))].name == 'N' and self.board[self.__checkbounds(kingpos - (8*2 + 1))].col != col
+        except IndexError: extr_top_right = False
+        try: top_left = self.board[self.__checkbounds(kingpos - (8 + 2))].name == 'N' and self.board[self.__checkbounds(kingpos - (8 + 2))].col != col
+        except IndexError: top_left = False
+        try: top_right = self.board[self.__checkbounds(kingpos - (8 - 2))].name == 'N' and self.board[self.__checkbounds(kingpos - (8 - 2))].col != col
+        except IndexError: top_right = False
+        try: bottom_left = self.board[self.__checkbounds(kingpos + (8 + 2))].name == 'N' and self.board[self.__checkbounds(kingpos + (8 + 2))].col != col
+        except IndexError: bottom_left = False
+        try: bottom_right = self.board[self.__checkbounds(kingpos + (8 - 2))].name == 'N' and self.board[self.__checkbounds(kingpos + (8 - 2))].col != col
+        except IndexError: bottom_right = False
+        try: extr_bottom_left = self.board[self.__checkbounds(kingpos + (8*2 - 1))].name == 'N' and self.board[self.__checkbounds(kingpos + (8*2 - 1))].col != col
+        except IndexError: extr_bottom_left = False
+        try: extr_bottom_right = self.board[self.__checkbounds(kingpos + (8*2 + 1))].name == 'N' and self.board[self.__checkbounds(kingpos + (8*2 + 1))].col != col
+        except IndexError: extr_bottom_right = False
 
-        if extr_top or top or bottom or extr_bottom: return True
+        if extr_top_left or extr_top_right or top_left or top_right or bottom_left or bottom_right or extr_bottom_left or extr_bottom_right: return True
 
         #check down threat
 
