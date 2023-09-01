@@ -107,9 +107,6 @@ class Boardstate:
                 endpos = 5 + offset
             self.__move(startpos, endpos, None)
             return
-
-        elif move_type == "checkmate":
-            pass
             
         self.__move(startpos, endpos, move)
         return

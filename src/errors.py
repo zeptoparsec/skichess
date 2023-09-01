@@ -19,3 +19,9 @@ class UnNamedFile(Exception):
 
 class InvalidPromotionInput(Exception):
     pass
+
+class StaleMate(Exception):
+    pass
+
+class CheckMate(Exception):
+    pass
