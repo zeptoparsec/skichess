@@ -6,17 +6,18 @@ from time import sleep
 from os import listdir, path, remove
 import argparse
 import json
+from oscompat import escapeFilePaths
 
 parser = argparse.ArgumentParser(description='Simple chess game')
 parser.add_argument('-t',type=int,default=600)
 args = parser.parse_args()
 
 def load_settings():
-    settings = open(path.dirname(path.abspath(__file__)) + "\\..\\data\\settings.json",'r').read()
+    settings = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','settings.json']),'r').read()
     return json.loads(settings)
 
 def update_settings(updates):
-    with open(path.dirname(path.abspath(__file__)) + '\\..\\data\\settings.json','r+') as file:
+    with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','settings.json']),'r+') as file:
         file.seek(0)
         json.dump(updates, file, indent=4)
         file.truncate()
@@ -49,7 +50,7 @@ while True:
                         curr_dir += ' -> Play' if option == 0 else ' -> Delete'
                         
                         while True:
-                            cache_path = path.dirname(path.abspath(__file__)) + "\\..\\data\\games"
+                            cache_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','cache','games'])
                             cache_files = [i for i in listdir(cache_path)]
                             cache_files.append('Back')
 

@@ -5,6 +5,7 @@ from time import sleep
 from boardstate import Boardstate
 from player import Player
 from errors import *
+from oscompat import escapeFilePaths
 
 board = Boardstate()
 
@@ -33,7 +34,7 @@ class Pvp:
         board.makemove(startpos, endpos, self.turn, move)
 
     def __load_game(self):
-        game = open(path.dirname(path.abspath(__file__)) + "\\..\\data\\games\\" + self.load,'r').read().split()
+        game = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games'], False) + self.load,'r').read().split()
         self.turn = bool(game[-7])
         self.time = [int(game[-6]), int(game[-5])]
         self.p1 = Player(game[-3], game[-4], None)
@@ -114,7 +115,7 @@ class Pvp:
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise UnNamedFile
 
-                    file = open(path.dirname(path.abspath(__file__)) + "\\..\\data\\games\\" + move[5:].lstrip(), 'w')
+                    file = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games'], False) + move[5:].lstrip(), 'w')
                     lines = [board.getMoveHistory(),
                             str(self.turn) + ' ',
                             str(self.time[0]) + ' ',
