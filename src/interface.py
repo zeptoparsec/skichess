@@ -67,7 +67,7 @@ while True:
                                     sleep(1)
                                     
                                 else:
-                                    remove(escapeFilePaths([cache_path, cache_files[option]])) #error
+                                    remove(cache_path + escapeFilePaths([cache_files[option]]))
                                     continue
 
                             else: 
