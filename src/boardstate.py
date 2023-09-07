@@ -1,6 +1,6 @@
 from errors import *
 from piece import Piece
-from checkmove import Checkmove
+from checkmove_backup import Checkmove
 
 class Boardstate:
     def __init__(self):

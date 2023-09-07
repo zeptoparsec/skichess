@@ -33,7 +33,7 @@ class Pvp:
         board.makemove(startpos, endpos, self.turn, move)
 
     def __load_game(self):
-        game = open(path.dirname(path.abspath(__file__)) + "\\..\\data\\games\\" + self.load,'r').read().split()
+        game = open(path.dirname(path.abspath(__file__)) + "/../data/games/" + self.load,'r').read().split()
         self.turn = bool(game[-7])
         self.time = [int(game[-6]), int(game[-5])]
         self.p1 = Player(game[-3], game[-4], None)
@@ -111,18 +111,37 @@ class Pvp:
                     self.turn = True
                     continue
 
+                # if move.__contains__('save:'): 
+                #     if len(move) == 5: raise UnNamedFile
+
+                #     file = open(path.dirname(path.abspath(__file__)) + "/../data/games/" + move[5:].lstrip(), 'w')
+                #     lines = [board.getMoveHistory(),
+                #             str(self.turn) + ' ',
+                #             str(self.time[0]) + ' ',
+                #             str(self.time[1]) + ' ',
+                #             self.p1.col + ' ',
+                #             self.p1.name + ' ',
+                #             self.p2.col + ' ',
+                #             self.p2.name + ' ',
+                #     ]
+                #     file.writelines(lines)
+                #     file.close()
+
+                #     board.restart()
+                #     return
+
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise UnNamedFile
 
-                    file = open(path.dirname(path.abspath(__file__)) + "\\..\\data\\games\\" + move[5:].lstrip(), 'w')
-                    lines = [board.getMoveHistory(),
-                            str(self.turn) + ' ',
+                    file = open(path.dirname(path.abspath(__file__)) + "/../data/games/" + move[5:].lstrip(), 'w')
+                    lines = [board.getMoveHistory() + '\n',
+                            str(self.turn) + ' \n',
                             str(self.time[0]) + ' ',
-                            str(self.time[1]) + ' ',
-                            self.p1.col + ' ',
-                            self.p1.name + ' ',
-                            self.p2.col + ' ',
-                            self.p2.name + ' ',
+                            str(self.time[1]) + ' \n',
+                            'W ',
+                            self.p1.name if self.p1.col == 'W' else self.p2.name,
+                            ' B ',
+                            self.p1.name if self.p1.col == 'B' else self.p2.name
                     ]
                     file.writelines(lines)
                     file.close()
@@ -138,8 +157,10 @@ class Pvp:
             except EmptyBox: print("There is no piece there")
             except CaptureOwnPiece: print("Cannot capture your own piece")
             except UnNamedFile: print("File name is required")
-            except InvalidPromotionInput:print("Invalid piece: Use Q, B, N, R")
+            except InvalidPromotionInput: print("Invalid piece: Use Q, B, N, R")
             except Exception: print("Invalid Input!")
+            except CheckMate: break
+            except StaleMate: break
             else: 
                 self.turn = not self.turn
                 continue
@@ -147,6 +168,7 @@ class Pvp:
 
         board.restart()
         del self.p1, self.p2
+
 
         # Game results here
         print("\nPress any key to continue")

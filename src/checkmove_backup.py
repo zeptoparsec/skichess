@@ -1,11 +1,10 @@
-from errors import InvalidMove, IllegalMove, CheckMate, StaleMate
+from errors import InvalidMove, IllegalMove
 
 class Checkmove:
     def __init__(self, board) -> None:
         self.board = board
 
-    def __pawn(self, color, pos):
-        moves = []
+    def __pawn(self):
         if self.board[self.pos].col == 'B': 
             if 15 >= self.pos >= 8:
                 if self.target == self.pos + (8) or self.target == self.pos + (8*2):
@@ -73,33 +72,20 @@ class Checkmove:
     def __king(self):
         return self.dy in [-1,0,1] and self.dx in [-1,0,1]
 
-    def __primary_validation(self):
+    def __piece(self):
         if self.type == 'P': 
-            moves = self.__pawn(self.pos, self.target)
-            if self.target not in moves: raise InvalidMove("pawn")
-
+            if not self.__pawn(): raise InvalidMove("pawn")
         elif self.type == 'R': 
-            moves = self.__rook(self.pos, self.target)
-            if self.target not in moves: raise InvalidMove("rook")
-        
-        elif self.type == 'N':
-            moves = self.__knight(self.pos, self.target)
-            if self.target not in moves: raise InvalidMove("knight")
-
-        elif self.type == 'B':
-            moves = self.__bishop(self.pos, self.target) 
-            if self.target not in moves: raise InvalidMove("bishop")
-
-        elif self.type == 'Q':
-            moves = self.__queen(self.pos, self.target) 
-            if self.target not in moves: raise InvalidMove("queen")
-
-        elif self.type == 'K':
-            moves = self.__king(self.pos, self.target) 
-            if self.target not in moves: raise InvalidMove("king")
-
+            if not self.__rook(): raise InvalidMove("rook")
+        elif self.type == 'N': 
+            if not self.__knight(): raise InvalidMove("knight")
+        elif self.type == 'B': 
+            if not self.__bishop(): raise InvalidMove("bishop")
+        elif self.type == 'Q': 
+            if not self.__queen(): raise InvalidMove("queen")
+        elif self.type == 'K': 
+            if not self.__king(): raise InvalidMove("king")
         else: raise Exception('Unknown error in __piece')
-        return True
 
     def __promotion(self):
         if not self.__pawn(): return False
@@ -190,13 +176,13 @@ class Checkmove:
         self.dy = self.target//8 - self.pos//8
         self.dx = self.target%8 - self.pos%8
 
-        if self.__promotion(): secondary_validation = "promotion"
-        elif self.__castling(): secondary_validation = "castling"
-        elif self.__enpassant(): secondary_validation = "enpassant"
+        if self.__promotion(): return_value = "promotion"
+        elif self.__castling(): return_value = "castling"
+        elif self.__enpassant(): return_value = "enpassant"
+        else: return_value = self.__piece()
 
-        if self.__checkmate(): raise CheckMate
-        elif self.__stalemate(): raise StaleMate
+        if self.__checkmate(): return "checkmate"
+        elif self.__stalemate(): return "stalemate"
         elif self.__check(self.board[startpos].col): raise IllegalMove
-        
-        if not secondary_validation: return self.__primary_validation()
-        else: return secondary_validation
+        else: return return_value
+    
