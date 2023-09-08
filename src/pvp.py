@@ -6,6 +6,7 @@ from boardstate import Boardstate
 from player import Player
 from errors import *
 from oscompat import escapeFilePaths
+import json
 
 board = Boardstate()
 
@@ -34,18 +35,19 @@ class Pvp:
         board.makemove(startpos, endpos, self.turn, move)
 
     def __load_game(self):
-        game = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games'], False) + self.load,'r').read().split()
-        self.turn = bool(game[-7])
-        self.time = [int(game[-6]), int(game[-5])]
-        self.p1 = Player(game[-3], game[-4], None)
-        self.p2 = Player(game[-1], game[-2], None)
-        del game[-7:]
+        file = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r')
+        data = json.load(file)
+        moves = data["moves"].split()
 
-        for i in game:
+        self.time = [data["wtime"], data["btime"]]
+        self.p1 = Player(data["white"], 'W', None)
+        self.p2 = Player(data["black"], 'B', None)
+
+        for i in moves:
             self.__makemove(i)
             self.turn = not self.turn
 
-        board.loadGame(' '.join([str(i) for i in game]) + ' ')
+        board.loadGame(' '.join([str(i) for i in moves]) + ' ')
 
     def __validate_name(self):
         if self.p1.name == '': self.p1.name = '-'
@@ -54,6 +56,7 @@ class Pvp:
         self.p2.name = self.p2.name.replace(' ', '_')
 
     def run(self):
+        format_time = lambda s: ("{}:{}".format(s//60, s - (s//60)*60))
         self.__clearscreen()
         print("Chess pvp")
 
@@ -64,41 +67,36 @@ class Pvp:
 
         self.__validate_name()
         then = now = 0
+        
+        time_offset = lambda x: (abs(len(self.p1.name) - len(self.p2.name))) if len(self.p1.name if self.p1.col == x else self.p2.name) < len(self.p1.name if self.p1.col != x else self.p2.name) else 0
         while True:
             self.__clearscreen()
             print("Chess pvp")
-            print(' ' + self.p1.name + ':', "White" if self.p1.col == 'W' else "Black")
-            print(' ' + self.p2.name + ':', "White" if self.p2.col == 'W' else "Black")
+            print("White: {}{} [{}]".format(self.p1.name if self.p1.col == 'W' else self.p2.name, ' '*time_offset('W'), format_time(self.time[0])))
+            print("Black: {}{} [{}]".format(self.p1.name if self.p1.col == 'B' else self.p2.name, ' '*time_offset('B'), format_time(self.time[1])))
             print()
 
             board.printboard(self.legacy)
 
-            print()
-            print("Commands:")
-            print(" back\n restart\n save: <file name>\n <move>: eg - b1a3")
-
-            self.time[int(not self.turn)] -= then - now - self.inc[int(not self.turn)]
-
-            print()
-            print("Time spent:", then-now)
-            print("Time left :", self.time[int(not self.turn)])
-            print()
+            print("\nCommands:")
+            print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1\n")
 
             if self.time[0] <= 0:
-                print('Black ran out of time!')
-                print(self.p2.name, "wins!")
+                print('\nBlack ran out of time!')
+                print(self.p1.name if self.p1.col != 'B' else self.p2.name, "wins!")
                 break
             
             if self.time[1] <= 0:
-                print('White ran out of time!')
-                print(self.p1.name, "wins!")
+                print('\nWhite ran out of time!')
+                print(self.p1.name if self.p1.col != 'W' else self.p2.name, "wins!")
                 break
 
             now = int(datetime.now().timestamp())
-
-            if self.turn: move = input("White's turn: ").lower()
+            if self.turn: move = input("White's turn: ").lower() #input
             else: move = input("Black's turn: ").lower()
             then = int(datetime.now().timestamp())
+
+            self.time[int(not self.turn)] -= then - now - self.inc[int(not self.turn)]
 
             try:
                 if move == 'back': 
@@ -112,40 +110,19 @@ class Pvp:
                     self.turn = True
                     continue
 
-                # if move.__contains__('save:'): 
-                #     if len(move) == 5: raise UnNamedFile
-
-                #     file = open(path.dirname(path.abspath(__file__)) + "/../data/games/" + move[5:].lstrip(), 'w')
-                #     lines = [board.getMoveHistory(),
-                #             str(self.turn) + ' ',
-                #             str(self.time[0]) + ' ',
-                #             str(self.time[1]) + ' ',
-                #             self.p1.col + ' ',
-                #             self.p1.name + ' ',
-                #             self.p2.col + ' ',
-                #             self.p2.name + ' ',
-                #     ]
-                #     file.writelines(lines)
-                #     file.close()
-
-                #     board.restart()
-                #     return
-
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise UnNamedFile
 
-                    file = open(path.dirname(path.abspath(__file__)) + "\\..\\data\\games\\" + move[5:].lstrip(), 'w')
-                    lines = [board.getMoveHistory(),
-                            str(self.turn) + ' ',
-                            str(self.time[0]) + ' ',
-                            str(self.time[1]) + ' \n',
-                            'W ',
-                            self.p1.name if self.p1.col == 'W' else self.p2.name,
-                            ' B ',
-                            self.p1.name if self.p1.col == 'B' else self.p2.name
-                    ]
-                    file.writelines(lines)
-                    file.close()
+                    with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(["..","data","games", move[5:]]).lstrip(), 'w') as file:
+                        lines = {"moves": board.getMoveHistory(),
+                                "wtime": self.time[0],
+                                "btime": self.time[1],
+                                "white": self.p1.name if self.p1.col == 'W' else self.p2.name,
+                                "black": self.p1.name if self.p1.col == 'B' else self.p2.name
+                        }
+
+                        file.seek(0)
+                        json.dump(lines, file, indent=4)
 
                     board.restart()
                     return
@@ -169,7 +146,6 @@ class Pvp:
 
         board.restart()
         del self.p1, self.p2
-
 
         # Game results here
         print("\nPress any key to continue")

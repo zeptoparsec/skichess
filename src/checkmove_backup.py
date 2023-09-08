@@ -133,6 +133,7 @@ class Checkmove:
 
     def __check(self, col):
         #To-do update the board
+        return False
         kingpos = 0
         for i in range(64):
             if self.board[i].name == 'K' and self.board[i].col == col:
