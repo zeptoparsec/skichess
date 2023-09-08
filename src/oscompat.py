@@ -1,8 +1,8 @@
-import os
+from os import name, system
 from itertools import chain
 
 def escapeFilePaths(path, file=True):
-    if os.name == 'nt':
+    if name == 'nt':
         ch = "\\"
     else:
         ch = "/"
@@ -17,3 +17,7 @@ def escapeFilePaths(path, file=True):
         xs.pop()
 
     return ''.join(list(chain.from_iterable(xs)))
+
+def clr():
+    if name == 'nt': system('cls')
+    else: system('clear')

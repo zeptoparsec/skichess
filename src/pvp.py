@@ -1,11 +1,11 @@
 from datetime import datetime
-from os import name, system, path
+from os import path
 import random
 from time import sleep
 from boardstate import Boardstate
 from player import Player
 from errors import *
-from oscompat import escapeFilePaths
+from oscompat import escapeFilePaths, clr
 import json
 
 board = Boardstate()
@@ -22,10 +22,6 @@ class Pvp:
         self.turn = turn
         self.legacy = legacy
         self.load = load
-        
-    def __clearscreen(self):
-        if name == 'nt': system('cls')
-        else: system('clear')
 
     def __makemove(self, move):
         startpos = self.x_axis[move[0]] + self.y_axis[move[1]]*8 - 1
@@ -49,15 +45,9 @@ class Pvp:
 
         board.loadGame(' '.join([str(i) for i in moves]) + ' ')
 
-    def __validate_name(self):
-        if self.p1.name == '': self.p1.name = '-'
-        if self.p2.name == '': self.p2.name = '-'
-        self.p1.name = self.p1.name.replace(' ', '_')
-        self.p2.name = self.p2.name.replace(' ', '_')
-
     def run(self):
         format_time = lambda s: ("{}:{}".format(s//60, s - (s//60)*60))
-        self.__clearscreen()
+        clr()
         print("Chess pvp")
 
         if self.load == False:
@@ -65,12 +55,11 @@ class Pvp:
             self.p2 = Player(input("Player two: "), 'W' if self.p1.col == 'B' else 'B', None)
         else: self.__load_game()
 
-        self.__validate_name()
         then = now = 0
         
         time_offset = lambda x: (abs(len(self.p1.name) - len(self.p2.name))) if len(self.p1.name if self.p1.col == x else self.p2.name) < len(self.p1.name if self.p1.col != x else self.p2.name) else 0
         while True:
-            self.__clearscreen()
+            clr()
             print("Chess pvp")
             print("White: {}{} [{}]".format(self.p1.name if self.p1.col == 'W' else self.p2.name, ' '*time_offset('W'), format_time(self.time[0])))
             print("Black: {}{} [{}]".format(self.p1.name if self.p1.col == 'B' else self.p2.name, ' '*time_offset('B'), format_time(self.time[1])))
@@ -118,7 +107,8 @@ class Pvp:
                                 "wtime": self.time[0],
                                 "btime": self.time[1],
                                 "white": self.p1.name if self.p1.col == 'W' else self.p2.name,
-                                "black": self.p1.name if self.p1.col == 'B' else self.p2.name
+                                "black": self.p1.name if self.p1.col == 'B' else self.p2.name,
+                                "mode": "pvp"
                         }
 
                         file.seek(0)

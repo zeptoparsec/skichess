@@ -1,15 +1,11 @@
 from pynput.keyboard import Key, Listener
-from os import system, name
+from oscompat import clr
 from time import sleep
-
-def clearscreen():
-    if name == 'nt': system('cls')
-    else: system('clear')
 
 def menu(title, options, setpointer):
     pointer = setpointer
     def print_options():
-        clearscreen()
+        clr()
 
         print(title)
         for i in range(len(options)):

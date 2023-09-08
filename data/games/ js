@@ -1,7 +1,8 @@
 {
-    "moves": "a2a4 a7a5 a1a2 ",
-    "wtime": 598,
-    "btime": 596,
+    "moves": "a2a4 a7a5 a1a2 a8a7 ",
+    "wtime": 594,
+    "btime": 592,
     "white": "-",
-    "black": "-"
+    "black": "-",
+    "mode": "pvp"
 }
