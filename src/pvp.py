@@ -5,7 +5,7 @@ from time import sleep
 from boardstate import Boardstate
 from player import Player
 from errors import *
-from oscompat import escapeFilePaths, clr
+from oscompat import *
 import json
 
 board = Boardstate()
@@ -22,13 +22,7 @@ class Pvp:
         self.turn = turn
         self.legacy = legacy
         self.load = load
-
-    def __makemove(self, move):
-        startpos = self.x_axis[move[0]] + self.y_axis[move[1]]*8 - 1
-        endpos = self.x_axis[move[2]] + self.y_axis[move[3]]*8 - 1
-
-        if not (move[0: 3: 2].isalpha() and move[1: 4: 2].isnumeric() and len(move) == 4): raise Exception
-        board.makemove(startpos, endpos, self.turn, move)
+        self.preview = False
 
     def __load_game(self):
         file = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r')
@@ -44,6 +38,23 @@ class Pvp:
             self.turn = not self.turn
 
         board.loadGame(' '.join([str(i) for i in moves]) + ' ')
+
+    def __makemove(self, move):
+        if not (move[0].isalpha and move[1].isdigit()): raise Exception
+        startpos = self.x_axis[move[0]] + self.y_axis[move[1]]*8 - 1
+        self.preview = False
+        board.unpreview()
+
+        if len(move) == 2: 
+            self.preview = True
+            board.preview(startpos)
+
+        elif len(move) == 4: 
+            if not (move[2].isalpha and move[3].isdigit()): raise Exception
+            endpos = self.x_axis[move[2]] + self.y_axis[move[3]]*8 - 1
+            board.makemove(startpos, endpos, self.turn, move)
+
+        else: raise Exception
 
     def run(self):
         format_time = lambda s: ("{}:{}".format(s//60, s - (s//60)*60))
@@ -61,9 +72,15 @@ class Pvp:
         while True:
             clr()
             print("Chess pvp")
-            print("White: {}{} [{}]".format(self.p1.name if self.p1.col == 'W' else self.p2.name, ' '*time_offset('W'), format_time(self.time[0])))
-            print("Black: {}{} [{}]".format(self.p1.name if self.p1.col == 'B' else self.p2.name, ' '*time_offset('B'), format_time(self.time[1])))
-            print()
+            print("White: {}{} [{}]\nBlack: {}{} [{}]\n".format(
+                    self.p1.name if self.p1.col == 'W' else self.p2.name, 
+                    ' '*time_offset('W'), 
+                    format_time(self.time[0]),
+                    self.p1.name if self.p1.col == 'B' else self.p2.name,
+                    ' '*time_offset('B'), 
+                    format_time(self.time[1])
+                )
+            )
 
             board.printboard(self.legacy)
 
@@ -103,13 +120,14 @@ class Pvp:
                     if len(move) == 5: raise UnNamedFile
 
                     with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(["..","data","games", move[5:]]).lstrip(), 'w') as file:
-                        lines = {"moves": board.getMoveHistory(),
-                                "wtime": self.time[0],
-                                "btime": self.time[1],
-                                "white": self.p1.name if self.p1.col == 'W' else self.p2.name,
-                                "black": self.p1.name if self.p1.col == 'B' else self.p2.name,
-                                "mode": "pvp"
-                        }
+                        lines = {
+                                    "moves": board.getMoveHistory(),
+                                    "wtime": self.time[0],
+                                    "btime": self.time[1],
+                                    "white": self.p1.name if self.p1.col == 'W' else self.p2.name,
+                                    "black": self.p1.name if self.p1.col == 'B' else self.p2.name,
+                                    "mode": "pvp"
+                                }
 
                         file.seek(0)
                         json.dump(lines, file, indent=4)
@@ -126,13 +144,16 @@ class Pvp:
             except CaptureOwnPiece: print("Cannot capture your own piece")
             except UnNamedFile: print("File name is required")
             except InvalidPromotionInput: print("Invalid piece: Use Q, B, N, R")
-            except Exception: print("Invalid Input!")
             except CheckMate: break
             except StaleMate: break
+            except Exception: print("Invalid Input!")
             else: 
-                self.turn = not self.turn
+                if not self.preview: 
+                    self.turn = not self.turn
+                    board.unpreview()
                 continue
             sleep(3)
+            self.time[int(not self.turn)] -= 3
 
         board.restart()
         del self.p1, self.p2
