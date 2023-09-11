@@ -1,0 +1,8 @@
+{
+    "moves": "a2a3 g1h3 b1c3 b1c3 c3e4 c3d5 f2f3 d5c7 e1f2 ",
+    "wtime": 563,
+    "btime": 539,
+    "white": "y",
+    "black": "x",
+    "mode": "pvp"
+}

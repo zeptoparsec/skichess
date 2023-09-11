@@ -27,7 +27,7 @@ active_settings = load_settings()
 back = lambda path, remove: path[:-len(remove)] if path.endswith(remove) else path
 
 # menu tree
-curr_dir = 'Chess Engine'
+curr_dir = " _   _           _              ____                _                   _   _\n| | | |_ __   __| | ___ _ __   / ___|___  _ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __\n| | | | '_ \\ / _` |/ _ \\ '__| | |   / _ \\| '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ \n| |_| | | | | (_| |  __/ |    | |__| (_) | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |\n \\___/|_| |_|\\__,_|\\___|_|     \\____\\___/|_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|\n\n Home"
 select = [0, 0, 0, 0]
 while True:
     option = menu.run(curr_dir, ['New Game', 'Saved Game', 'Lan Game', 'Settings', 'Exit'], select[0])
@@ -80,7 +80,7 @@ while True:
                             if data["mode"] == "pvp":
                                 Pvp([args.t, args.t], True, cache_files[option], active_settings['legacy']).run()
                             
-                            elif data["mode"] == "pvai":
+                            elif data["mode"] == "pva":
                                 Pva().run()
                             sleep(1)
                             
