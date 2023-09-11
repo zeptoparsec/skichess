@@ -33,28 +33,38 @@ class Boardstate:
 
         self.__movehistory = ''
 
-    def printboard(self, legacy):
+    def printboard(self, legacy, turn):
         if legacy:
             pieces = {
                 'PW': 'P', 'RW': 'R', 'NW': 'N', 'BW': 'B', 'KW': 'K', 'QW': 'Q',
                 'PB': 'p', 'RB': 'r', 'NB': 'n', 'BB': 'b', 'KB': 'k', 'QB': 'q',
-                'EN' : ' ', 'HN': '*'
+                'EN': ' ', 'HN': '*'
             }
         else:
             pieces = {
                 'PW': '♟', 'RW': '♜', 'NW': '♞', 'BW': '♝', 'KW': '♚', 'QW': '♛',
                 'PB': '♙', 'RB': '♖', 'NB': '♘', 'BB': '♗', 'KB': '♔', 'QB': '♕',
-                'EN' : ' ', 'HN': '*'
+                'EN': ' ', 'HN': '*'
             }
         
         for i in range(8):
+            # if turn:
+            #     print(8-i,end=' ')
+            # else:
+            #     print(i+1,end=' ')
             print(8-i,end=' ')
-
             for j in range(8):
-                print(pieces[self.__board[8*i+j].name+self.__board[8*i+j].col], end=' ')
+                if turn:
+                    print(pieces[self.__board[8*i+j].name+self.__board[8*i+j].col], end=' ')
+                else:
+                    print(pieces[self.__board[63-8*i-j].name+self.__board[63-8*i-j].col], end=' ')
             print()
         print(end='  ')
         for i in range(1,9):
+            # if turn:
+            #     print(chr(64+i),end=' ')
+            # else:
+            #     print(chr(73-i),end=' ')
             print(chr(64+i),end=' ')
         print()
 

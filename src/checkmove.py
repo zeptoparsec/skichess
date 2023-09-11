@@ -1,4 +1,3 @@
-from re import L
 from errors import *
 import operator
 
@@ -160,6 +159,7 @@ class Checkmove:
         return True
     
     def __enpassant(self):
+        if self.type != 'P': return False
         offset = 24 if self.board[self.pos].col == 'W' else 32
         killpos = self.target + (8 if self.board[self.pos].col == 'W' else -8)
         if self.board[killpos].col != 'N': return False

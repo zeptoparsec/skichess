@@ -81,7 +81,7 @@ while True:
                                 Pvp([args.t, args.t], True, cache_files[option], active_settings['legacy']).run()
                             
                             elif data["mode"] == "pvai":
-                                Pva.run()
+                                Pva().run()
                             sleep(1)
                             
                         else:

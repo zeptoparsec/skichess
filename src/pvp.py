@@ -1,61 +1,13 @@
 from datetime import datetime
-from os import path
 import random
 from time import sleep
-from boardstate import Boardstate
 from player import Player
 from errors import *
 from oscompat import *
-import json
+from game import Game
+from game import board
 
-board = Boardstate()
-
-class Pvp:
-    
-    def __init__(self, time, turn, load, legacy):
-        self.x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
-        self.y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
-        self.then = 0
-        self.now = 0
-        self.time = time
-        self.inc = [0, 0]
-        self.turn = turn
-        self.legacy = legacy
-        self.load = load
-        self.preview = False
-
-    def __load_game(self):
-        file = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r')
-        data = json.load(file)
-        moves = data["moves"].split()
-
-        self.time = [data["wtime"], data["btime"]]
-        self.p1 = Player(data["white"], 'W', None)
-        self.p2 = Player(data["black"], 'B', None)
-
-        for i in moves:
-            self.__makemove(i)
-            self.turn = not self.turn
-
-        board.loadGame(' '.join([str(i) for i in moves]) + ' ')
-
-    def __makemove(self, move):
-        if not (move[0].isalpha and move[1].isdigit()): raise Exception
-        startpos = self.x_axis[move[0]] + self.y_axis[move[1]]*8 - 1
-        self.preview = False
-        board.unpreview()
-
-        if len(move) == 2: 
-            self.preview = True
-            board.preview(startpos)
-
-        elif len(move) == 4: 
-            if not (move[2].isalpha and move[3].isdigit()): raise Exception
-            endpos = self.x_axis[move[2]] + self.y_axis[move[3]]*8 - 1
-            board.makemove(startpos, endpos, self.turn, move)
-
-        else: raise Exception
-
+class Pvp(Game):
     def run(self):
         format_time = lambda s: ("{}:{}".format(s//60, s - (s//60)*60))
         clr()
@@ -64,7 +16,7 @@ class Pvp:
         if self.load == False:
             self.p1 = Player(input("Player one: "), random.choice(['W', 'B']), None)
             self.p2 = Player(input("Player two: "), 'W' if self.p1.col == 'B' else 'B', None)
-        else: self.__load_game()
+        else: self._load_game()
 
         then = now = 0
         
@@ -82,7 +34,7 @@ class Pvp:
                 )
             )
 
-            board.printboard(self.legacy)
+            board.printboard(self.legacy, self.turn)
 
             print("\nCommands:")
             print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1\n")
@@ -119,23 +71,12 @@ class Pvp:
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise UnNamedFile
 
-                    with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(["..","data","games", move[5:]]).lstrip(), 'w') as file:
-                        lines = {
-                                    "moves": board.getMoveHistory(),
-                                    "wtime": self.time[0],
-                                    "btime": self.time[1],
-                                    "white": self.p1.name if self.p1.col == 'W' else self.p2.name,
-                                    "black": self.p1.name if self.p1.col == 'B' else self.p2.name,
-                                    "mode": "pvp"
-                                }
-
-                        file.seek(0)
-                        json.dump(lines, file, indent=4)
+                    self._save_game(move)
 
                     board.restart()
                     return
 
-                self.__makemove(move)
+                self._makemove(move)
 
             except InvalidMove as e: print("Invalid Move:", e, "cannot move there")
             except IllegalMove: print("Check!")
