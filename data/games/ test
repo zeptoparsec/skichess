@@ -1,8 +1,8 @@
 {
-    "moves": "a2a3 g1h3 b1c3 b1c3 c3e4 c3d5 f2f3 d5c7 e1f2 ",
-    "wtime": 563,
-    "btime": 539,
-    "white": "y",
-    "black": "x",
+    "moves": "d2d4 d7d5 g1f3 g8f6 a2a3 d8d6 ",
+    "wtime": 417,
+    "btime": 562,
+    "white": "player 2",
+    "black": "player 1",
     "mode": "pvp"
 }

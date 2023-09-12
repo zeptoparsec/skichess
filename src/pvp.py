@@ -34,7 +34,7 @@ class Pvp(Game):
                 )
             )
 
-            board.printboard(self.legacy, self.turn)
+            board.printboard(self.legacy, self.turn, self.fixed_axis)
 
             print("\nCommands:")
             print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1\n")

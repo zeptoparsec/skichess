@@ -33,7 +33,7 @@ class Boardstate:
 
         self.__movehistory = ''
 
-    def printboard(self, legacy, turn):
+    def printboard(self, legacy, turn, fixed_axis):
         if legacy:
             pieces = {
                 'PW': 'P', 'RW': 'R', 'NW': 'N', 'BW': 'B', 'KW': 'K', 'QW': 'Q',
@@ -48,11 +48,12 @@ class Boardstate:
             }
         
         for i in range(8):
-            # if turn:
-            #     print(8-i,end=' ')
-            # else:
-            #     print(i+1,end=' ')
-            print(8-i,end=' ')
+            if fixed_axis: print(8-i,end=' ')
+            else: 
+                if turn:
+                    print(8-i,end=' ')
+                else:
+                    print(i+1,end=' ')
             for j in range(8):
                 if turn:
                     print(pieces[self.__board[8*i+j].name+self.__board[8*i+j].col], end=' ')
@@ -61,11 +62,12 @@ class Boardstate:
             print()
         print(end='  ')
         for i in range(1,9):
-            # if turn:
-            #     print(chr(64+i),end=' ')
-            # else:
-            #     print(chr(73-i),end=' ')
-            print(chr(64+i),end=' ')
+            if fixed_axis: print(chr(64+i),end=' ')
+            else: 
+                if turn:
+                    print(chr(64+i),end=' ')
+                else:
+                    print(chr(73-i),end=' ')
         print()
 
     def restart(self):
@@ -85,9 +87,7 @@ class Boardstate:
 
     def preview(self, pos):
         checkmove = Checkmove(self.__board)
-
         if self.__board[pos].col == 'N': raise EmptyBox
-
         poses = checkmove.preview(pos)
         for i in poses:
             if self.__board[i].col == 'N': self.__board[i] = Piece('H', i, 0, 'N', [])
@@ -105,10 +105,9 @@ class Boardstate:
         is_empty_space = self.__board[startpos].col == 'N'
         is_correct_piece = True if turn == (self.__board[startpos].col == 'W') else False
     
-        if is_same_colour or is_empty_space or not is_correct_piece:
-            if is_empty_space: raise EmptyBox
-            elif not is_correct_piece: raise OpponentsPiece
-            elif is_same_colour: raise CaptureOwnPiece
+        if is_empty_space: raise EmptyBox
+        elif not is_correct_piece: raise OpponentsPiece
+        elif is_same_colour: raise CaptureOwnPiece
 
         move_type = checkmove.validate(startpos, endpos)
         if move_type == "promotion":

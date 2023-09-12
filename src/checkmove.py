@@ -14,7 +14,7 @@ class Checkmove:
                 moves.append(ops(pos, 8))
             
         if 0 <= ops(pos, 8*2) <= 63 and (offset + 8) <= pos <= (offset + 15):
-            if self.board[ops(pos, 8*2)].col == 'N': 
+            if self.board[ops(pos, 8*2)].col == 'N' or self.board[ops(pos, 8)].col == 'N': 
                 moves.append(ops(pos, 8*2))
 
         if 0 <= ops(pos, (8 + 1)) <= 63 and pos%8 != (0 if col == 'W' else 7):

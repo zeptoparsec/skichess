@@ -1,3 +1,4 @@
 {
-    "legacy": false
+    "legacy": false,
+    "fixed_axis": true
 }
