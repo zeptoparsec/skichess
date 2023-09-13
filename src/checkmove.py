@@ -200,7 +200,17 @@ class Checkmove:
             if self.board[i].name in 'K' and self.board[i].col not in col + 'N':
                 return True
 
-        # to-do pawn
+        s = lambda x: abs(kingpos//8 - x//8) <= 1 and abs(kingpos%8 - x%8) <= 1
+        if col == 'B':
+            if self.board[kingpos + (8 - 1)].name == 'P' and self.board[kingpos + (8 - 1)].col == 'W' and s(kingpos + (8 - 1)):
+                return True
+            elif self.board[kingpos + (8 + 1)].name == 'P' and self.board[kingpos + (8 + 1)].col == 'W' and s(kingpos + (8 + 1)):
+                return True
+        elif col == 'W':
+            if self.board[kingpos - (8 - 1)].name == 'P' and self.board[kingpos - (8 - 1)].col == 'B' and s(kingpos - (8 - 1)):
+                return True
+            elif self.board[kingpos - (8 + 1)].name == 'P' and self.board[kingpos - (8 + 1)].col == 'W' and s(kingpos - (8 + 1)):
+                return True
         
         return False
                 
