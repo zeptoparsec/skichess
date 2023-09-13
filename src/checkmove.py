@@ -35,23 +35,29 @@ class Checkmove:
         i = 1 #up
         while xbounds(pos - 8*i) and self.board[pos - 8*i].col != col:
             moves.append(pos - 8*i)
+            if self.board[pos - 8*i].col != 'N': break
             i += 1
 
         i = 1 #down
         while xbounds(pos + 8*i) and self.board[pos + 8*i].col != col:
             moves.append(pos + 8*i)
+            if self.board[pos + 8*i].col != 'N': break
             i += 1
+            
 
         i = 1 #right
         while ybounds(pos + i) and self.board[pos + i].col != col:
             moves.append(pos + i)
+            if self.board[pos + i].col != 'N': break
             i += 1
+            
         
         i = 1 #left
         while ybounds(pos - i) and self.board[pos - i].col != col:
             moves.append(pos - i)
+            if self.board[pos - i].col != 'N': break
             i += 1
-                
+            
         return moves
 
     def __knight(self, pos, col):
@@ -82,21 +88,25 @@ class Checkmove:
         i = 1 #top-left
         while bounds(pos - (8*i + i)) and self.board[pos - (8*i + i)].col != col:
             moves.append(pos - (8*i + i))
+            if self.board[pos - (8*i + i)].col != 'N': break
             i += 1
 
         i = 1 #top-right
         while bounds(pos - (8*i - i)) and self.board[pos - (8*i - i)].col != col:
             moves.append(pos - (8*i - i))
+            if self.board[pos - (8*i - i)].col != 'N': break
             i += 1
 
         i = 1 #bottom-left
         while bounds(pos + (8*i - i)) and self.board[pos + (8*i - i)].col != col:
             moves.append(pos + (8*i - i))
+            if self.board[pos + (8*i - i)].col != 'N': break
             i += 1
 
         i = 1 #bottom-right
         while bounds(pos + (8*i + i)) and self.board[pos + (8*i + i)].col != col:
             moves.append(pos + (8*i + i))
+            if self.board[pos + (8*i + i)].col != 'N': break
             i += 1
 
         return moves
@@ -159,7 +169,6 @@ class Checkmove:
         return True
     
     def __enpassant(self):
-        if self.type != 'P': return False
         offset = 24 if self.board[self.pos].col == 'W' else 32
         killpos = self.target + (8 if self.board[self.pos].col == 'W' else -8)
         if self.board[killpos].col != 'N': return False
@@ -204,9 +213,10 @@ class Checkmove:
         self.dx = self.target%8 - self.pos%8
 
         complex_move = False
-        if self.__promotion(): complex_move = "promotion"
-        elif self.__castling(): complex_move = "castling"
-        elif self.__enpassant(): complex_move = "enpassant"
+        if self.type == 'P': 
+            if self.__promotion(): complex_move = "promotion"
+            elif self.__enpassant(): complex_move = "enpassant"
+        elif self.type == 'K' and self.__castling(): complex_move = "castling"
         
         if not complex_move: return self.__primary_validation()
         else: return complex_move
