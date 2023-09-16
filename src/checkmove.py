@@ -179,8 +179,14 @@ class Checkmove:
 
     def __check_check(self, target):
         for i in range(64):
-            if self.board[i].name == 'K' or self.board[i].col == self.board[self.pos].col or self.board[i].col == 'N':
+            if self.board[i].col == self.board[self.pos].col or self.board[i].col == 'N':
                 continue
+
+            if self.board[i].name == 'K':
+                if abs(self.pos//8 - i//8) <= 1 and abs(self.pos%8 - i%8) <= 1:
+                    return False
+                continue
+
             boardcp = self.board[::]
 
             boardcp[self.pos], boardcp[target] = boardcp[target], boardcp[self.pos]
