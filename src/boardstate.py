@@ -77,11 +77,8 @@ class Boardstate:
         if self.__board[startpos].moved: self.__board[startpos].moved_again = True
         else: self.__board[startpos].moved = True
 
-        if self.__board[endpos].col != 'N':
-            self.__board[endpos] = self.__board[startpos]
-            self.__board[startpos] = Piece('E',startpos,0,'N',[])
-        else:
-            self.__board[startpos], self.__board[endpos] = self.__board[endpos], self.__board[startpos]
+        self.__board[endpos] = self.__board[startpos]
+        self.__board[startpos] = Piece('E',startpos,0,'N',[])
 
         if move != None: self.__movehistory += move+' '
 
