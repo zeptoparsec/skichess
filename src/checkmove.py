@@ -116,7 +116,8 @@ class Checkmove:
 
     def __king(self, pos, col):# to-do
         s = lambda x: abs(pos//8 - x//8) <= 1 and abs(pos%8 - x%8) <= 1
-        return [i for i in self.__queen(pos, col) if s(i)]
+        check = lambda x: self.__check_check(x)
+        return [i for i in self.__queen(pos, col) if s(i) and check(i)]
 
     def __primary_validation(self):
         if self.type == 'P': 
@@ -176,17 +177,23 @@ class Checkmove:
         if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
         return True
 
-    def __check_check(self):
+    def __check_check(self, target):
         for i in range(64):
             if self.board[i].name == 'K' or self.board[i].col == self.board[self.pos].col or self.board[i].col == 'N':
                 continue
-            cmove = Checkmove(self.board)#to avoid polluting the current Checkmove object
-            cmove.pos = i
-            cmove.col = 'W' if self.col == 'B' else 'B'
+            boardcp = self.board[::]
 
-            if cmove.__primary_validation():
+            boardcp[self.pos], boardcp[target] = boardcp[target], boardcp[self.pos]
+
+            cmove = Checkmove(boardcp)#to avoid polluting the current Checkmove object
+
+            try:
+                cmove.validate(i, target)
+            except Exception:
+                pass
+            else:
                 return False
-            
+
         return True
 
     def check(self, col): # test it
