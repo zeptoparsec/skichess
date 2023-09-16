@@ -9,9 +9,12 @@ def escapeFilePaths(path, file=True):
 
     xs = [ch]
 
-    for i in path:
+    for i in path[0:-1]:
         xs.append(i)
         xs.append(ch)
+
+    xs.append(path[-1].lower())
+    xs.append(ch)
 
     if file:
         xs.pop()

@@ -87,7 +87,7 @@ class Pvp(Game):
             except InvalidPromotionInput: print("Invalid piece: Use Q, B, N, R")
             except CheckMate: break
             except StaleMate: break
-            except Exception: print("Invalid Input!")
+            except Exception as e: print("Invalid Input: "+str(e)+"!")
             else: 
                 if not self.preview: 
                     self.turn = not self.turn

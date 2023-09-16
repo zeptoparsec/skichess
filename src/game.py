@@ -62,7 +62,7 @@ class Game:
         else: raise Exception
 
     def _save_game(self, move):
-        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(["..","data","games", move[5:]]).lstrip(), 'w') as file:
+        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(["..","data","games", move[5:]+'.json']).lstrip(), 'w') as file:
             lines = {
                 "moves": board.getMoveHistory(),
                 "wtime": self.time[0],

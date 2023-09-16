@@ -71,7 +71,7 @@ while True:
                 
                 while True:
                     game_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games'])
-                    game_files = [i.title() for i in listdir(game_path)]
+                    game_files = [i for i in listdir(game_path)]
                     game_files.append('Back')
 
                     option = menu.run(curr_dir, game_files, select[2])
