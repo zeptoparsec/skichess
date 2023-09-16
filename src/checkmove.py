@@ -176,6 +176,19 @@ class Checkmove:
         if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
         return True
 
+    def __check_check(self):
+        for i in range(64):
+            if self.board[i].name == 'K' or self.board[i].col == self.board[self.pos].col or self.board[i].col == 'N':
+                continue
+            cmove = Checkmove(self.board)#to avoid polluting the current Checkmove object
+            cmove.pos = i
+            cmove.col = 'W' if self.col == 'B' else 'B'
+
+            if cmove.__primary_validation():
+                return False
+            
+        return True
+
     def check(self, col): # test it
         kingpos = 0
         for i in range(64):
