@@ -7,7 +7,7 @@ from boardstate import Boardstate
 board = Boardstate()
 
 class Game:
-    def __init__(self, time, turn, load, legacy, fixed_axis):
+    def __init__(self, time, turn, load, legacy, fixed_board, fixed_axis, board_sound):
         self.x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
         self.y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
         self.then = 0
@@ -18,7 +18,9 @@ class Game:
         self.load = load
         self.preview = False
         self.legacy = legacy
+        self.fixed_board = fixed_board
         self.fixed_axis = fixed_axis
+        self.board_sound = board_sound
 
     def _load_game(self):
         file = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r')

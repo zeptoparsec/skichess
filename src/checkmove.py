@@ -60,6 +60,8 @@ class Checkmove:
             
         return moves
 
+    # def __check_check
+
     def __knight(self, pos, col):
         moves = list()
         s = lambda x: abs(pos//8 - x//8) <= 2 and abs(pos%8 - x%8) <= 2
@@ -114,7 +116,7 @@ class Checkmove:
     def __queen(self, pos, col):
         return (self.__rook(pos, col) + self.__bishop(pos, col))
 
-    def __king(self, pos, col):# to-do
+    def __king(self, pos, col):
         s = lambda x: abs(pos//8 - x//8) <= 1 and abs(pos%8 - x%8) <= 1
         check = lambda x: self.__check_check(x)
         return [i for i in self.__queen(pos, col) if s(i) and check(i)]

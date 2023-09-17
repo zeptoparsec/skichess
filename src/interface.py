@@ -7,6 +7,8 @@ from os import listdir, path, remove
 import argparse
 import json
 from oscompat import escapeFilePaths
+from playsound import playsound
+from threading import Thread, Event
 
 parser = argparse.ArgumentParser(description='Simple chess game')
 parser.add_argument('-t',type=int,default=600)
@@ -25,6 +27,17 @@ def update_settings(updates):
 
 active_settings = load_settings()
 back = lambda path, remove: path[:-len(remove)] if path.endswith(remove) else path
+
+def loop_music():
+    while True:
+        if music_event.isSet(): break
+        playsound(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data', 'music', active_settings['music']]))
+
+music_event = Event()
+music_thread = Thread(target=loop_music)
+if active_settings['music'] != 'Off': 
+    music_event.clear()
+    music_thread.start()
 
 # menu tree
 curr_dir = " _   _           _              ____                _                   _   _\n| | | |_ __   __| | ___ _ __   / ___|___  _ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __\n| | | | '_ \\ / _` |/ _ \\ '__| | |   / _ \\| '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ \n| |_| | | | | (_| |  __/ |    | |__| (_) | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |\n \\___/|_| |_|\\__,_|\\___|_|     \\____\\___/|_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|\n\n Home"
@@ -45,7 +58,9 @@ while True:
                     True, 
                     False, 
                     active_settings['legacy'], 
-                    active_settings['fixed_axis']
+                    active_settings['fixed_board'],
+                    active_settings['fixed_axis'],
+                    active_settings['board_sound'],
                 ).run()
                 sleep(1)
 
@@ -71,10 +86,10 @@ while True:
                 
                 while True:
                     game_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games'])
-                    game_files = [i.title() for i in listdir(game_path)]
+                    game_files = listdir(game_path)
                     game_files.append('Back')
 
-                    option = menu.run(curr_dir, game_files, select[2])
+                    option = menu.run(curr_dir, [i.title().strip() for i in game_files], select[2])
                     select[2] = option
 
                     if game_files[option] != 'Back': 
@@ -88,7 +103,9 @@ while True:
                                     True, 
                                     game_files[option], 
                                     active_settings['legacy'],
-                                    active_settings['fixed_axis']
+                                    active_settings['fixed_board'],
+                                    active_settings['fixed_axis'],
+                                    active_settings['board_sound']
                                 ).run()
                             
                             elif data["mode"] == "pva":
@@ -119,26 +136,55 @@ while True:
             option = menu.run(
                 curr_dir, 
                 [
-                    'Legacy:   ' + ('Enabled' if active_settings['legacy'] else 'Disabled'), 
-                    'Fix Axis: ' + ('Enabled' if active_settings['fixed_axis'] else 'Disabled'), 
+                    'Legacy:      ' + ('Enabled' if active_settings['legacy'] else 'Disabled'), 
+                    'Fix Board:   ' + ('Enabled' if active_settings['fixed_board'] else 'Disabled'),
+                    'Fix Axis:    ' + ('Enabled' if active_settings['fixed_board'] or active_settings['fixed_axis'] else 'Disabled'), 
+                    'Board Sound: ' + ('Enabled' if active_settings['board_sound'] else 'Disabled'),
+                    'Music:       ' + active_settings['music'].title(),
                     'Back'
                 ], 
                 select[1]
             )
 
-            if option == 0:
+            if option == 0: 
                 active_settings['legacy'] = not active_settings['legacy']
-                update_settings(active_settings)
-                select[1] = option
 
-            elif option == 1:
+            elif option == 1: 
+                active_settings['fixed_board'] = not active_settings['fixed_board']
+
+            elif option == 2 and not active_settings['fixed_board']:
                 active_settings['fixed_axis'] = not active_settings['fixed_axis']
-                update_settings(active_settings)
-                select[1] = option
 
-            elif option == 2:
+            elif option == 3:
+                active_settings['board_sound'] = not active_settings['board_sound']
+
+            elif option == 4: 
+                curr_dir += ' -> Music'
+                music_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','music'])
+                music_list = ['Off'] + listdir(music_path) + ['Back']
+                music = menu.run(curr_dir, [i.title().strip() for i in music_list], 0)
+
+                if music != len(music_list) - 1:
+                    active_settings['music'] = music_list[music]
+
+                if active_settings['music'] == 'Off': 
+                    music_event.set()
+                else: 
+                    music_event.clear()
+                    if not music_thread.is_alive(): 
+                        music_thread = Thread(target=loop_music)
+                        music_thread.start()
+
+                curr_dir = back(curr_dir, " -> Music")
+
+            elif option == 5:
                 curr_dir = back(curr_dir, " -> Settings")
                 select[1] = 0
                 break
 
+            update_settings(active_settings)
+            select[1] = option
+
     elif option == 4: break
+
+# exit message
