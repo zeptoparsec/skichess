@@ -33,7 +33,7 @@ class Boardstate:
 
         self.__movehistory = ''
 
-    def printboard(self, legacy, turn, fixed_axis):
+    def printboard(self, legacy, turn, fixed_board, fixed_axis):
         if legacy:
             pieces = {
                 'PW': 'P', 'RW': 'R', 'NW': 'N', 'BW': 'B', 'KW': 'K', 'QW': 'Q',
@@ -48,21 +48,21 @@ class Boardstate:
             }
         
         for i in range(8):
-            if fixed_axis: print(8-i,end=' ')
+            if fixed_axis or fixed_board: print(8-i,end=' ')
             else: 
                 if turn:
                     print(8-i,end=' ')
                 else:
                     print(i+1,end=' ')
             for j in range(8):
-                if turn:
+                if turn or fixed_board:
                     print(pieces[self.__board[8*i+j].name+self.__board[8*i+j].col], end=' ')
                 else:
                     print(pieces[self.__board[63-8*i-j].name+self.__board[63-8*i-j].col], end=' ')
             print()
         print(end='  ')
         for i in range(1,9):
-            if fixed_axis: print(chr(64+i),end=' ')
+            if fixed_axis or fixed_board: print(chr(64+i),end=' ')
             else: 
                 if turn:
                     print(chr(64+i),end=' ')

@@ -27,36 +27,38 @@ class Game:
         data = json.load(file)
         moves = data["moves"].split()
         file.close()
-
+        fixed_axis = self.fixed_axis
+        self.fixed_axis, self.fixed_board = False, False
         self.time = [data["wtime"], data["btime"]]
         self.p1 = Player(data["white"], 'W', None)
         self.p2 = Player(data["black"], 'B', None)
-
         for i in moves:
             self._makemove(i)
             self.turn = not self.turn
 
         board.loadGame(' '.join([str(i) for i in moves]) + ' ')
+        self.fixed_axis = fixed_axis
 
-    def _makemove(self, move):
+    def _makemove(self, move): #fixed axis load game not working
         self.preview = False
         board.unpreview()
 
         startpos = self.x_axis[move[0]] + self.y_axis[move[1]]*8 - 1
 
-        if self.fixed_axis and not (self.turn or self.load):
+        if self.fixed_axis and not self.turn:
             startpos = 63 - startpos
 
         if len(move) == 2: 
             if not (move[0].isalpha and move[1].isdigit()): raise Exception
-            if self.fixed_axis and not (self.turn or self.load): move = chr(201 - ord(move[0])) + str(9 - int(move[1]))
+            if self.fixed_axis and not self.turn: 
+                move = chr(201 - ord(move[0])) + str(9 - int(move[1]))
             self.preview = True
             board.preview(startpos)
 
         elif len(move) == 4 : 
             if not (move[2].isalpha and move[3].isdigit()): raise Exception
             endpos = self.x_axis[move[2]] + self.y_axis[move[3]]*8 - 1
-            if self.fixed_axis and not (self.turn or self.load): 
+            if self.fixed_axis and not self.turn: 
                 move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
                 endpos = 63 - endpos
             board.makemove(startpos, endpos, self.turn, move.lower())

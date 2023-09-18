@@ -30,7 +30,7 @@ back = lambda path, remove: path[:-len(remove)] if path.endswith(remove) else pa
 
 def loop_music():
     while True:
-        if music_event.isSet(): break
+        if music_event.is_set(): break
         playsound(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data', 'music', active_settings['music']]))
 
 music_event = Event()
