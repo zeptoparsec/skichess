@@ -60,8 +60,6 @@ class Checkmove:
             
         return moves
 
-    # def __check_check
-
     def __knight(self, pos, col):
         moves = list()
         s = lambda x: abs(pos//8 - x//8) <= 2 and abs(pos%8 - x%8) <= 2
