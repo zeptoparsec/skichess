@@ -23,10 +23,10 @@ class Game:
         self.board_sound = board_sound
 
     def _load_game(self):
-        file = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r')
-        data = json.load(file)
-        moves = data["moves"].split()
-        file.close()
+        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r') as file:
+            data = json.load(file)
+            moves = data["moves"].split()
+
         fixed_axis = self.fixed_axis
         self.fixed_axis, self.fixed_board = False, False
         self.time = [data["wtime"], data["btime"]]
@@ -39,28 +39,27 @@ class Game:
         board.loadGame(' '.join([str(i) for i in moves]) + ' ')
         self.fixed_axis = fixed_axis
 
-    def _makemove(self, move): #fixed axis load game not working
+    def _axistopos(self, x, y):
+        newpos = self.x_axis[x] + self.y_axis[y]*8 - 1
+        if self.fixed_axis and not self.turn:
+            newpos = 63 - newpos
+        return newpos
+
+    def _makemove(self, move):
+        if not (move[0].isalpha and move[1].isdigit()): raise Exception
         self.preview = False
         board.unpreview()
-
-        startpos = self.x_axis[move[0]] + self.y_axis[move[1]]*8 - 1
-
-        if self.fixed_axis and not self.turn:
-            startpos = 63 - startpos
+        startpos = self._axistopos(move[0], move[1])
 
         if len(move) == 2: 
-            if not (move[0].isalpha and move[1].isdigit()): raise Exception
-            if self.fixed_axis and not self.turn: 
-                move = chr(201 - ord(move[0])) + str(9 - int(move[1]))
             self.preview = True
             board.preview(startpos)
 
         elif len(move) == 4 : 
             if not (move[2].isalpha and move[3].isdigit()): raise Exception
-            endpos = self.x_axis[move[2]] + self.y_axis[move[3]]*8 - 1
+            endpos = self._axistopos(move[2], move[3])
             if self.fixed_axis and not self.turn: 
                 move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
-                endpos = 63 - endpos
             board.makemove(startpos, endpos, self.turn, move.lower())
 
         else: raise Exception
@@ -78,4 +77,3 @@ class Game:
 
             file.seek(0)
             json.dump(lines, file, indent=4)
-            file.close()

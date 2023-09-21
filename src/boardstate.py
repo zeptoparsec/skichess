@@ -73,6 +73,14 @@ class Boardstate:
     def restart(self):
         self.__init__()
 
+    def __getpiecevalue(self, piece):
+        if piece == 'P': return 1
+        if piece == 'R': return 5
+        if piece == 'N': return 3.2
+        if piece == 'B': return 3.3
+        if piece == 'Q': return 9
+        if piece == 'K': return 200
+
     def __move(self, startpos, endpos, move):
         if self.__board[startpos].moved: self.__board[startpos].moved_again = True
         else: self.__board[startpos].moved = True
@@ -94,6 +102,17 @@ class Boardstate:
             if self.__board[i].name == 'H' and self.__board[i].col == 'N':
                 self.__board[i] = Piece('E', i ,0 , 'N', [])
 
+    def remove_piece(self, pos):
+        self.__board[pos] = Piece('E', pos, 0, 'N', [])
+
+    def add_piece(self, pos, piece, col): 
+        self.__board[pos] = Piece(
+            piece.upper(), 
+            pos, 
+            self.__getpiecevalue(piece), 
+            col, 
+            []
+        )
 
     def makemove(self, startpos, endpos, turn, move):
         checkmove = Checkmove(self.__board)

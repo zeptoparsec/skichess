@@ -4,8 +4,7 @@ from time import sleep
 from player import Player
 from errors import *
 from oscompat import *
-from game import Game
-from game import board
+from game import Game, board
 
 class Pvp(Game):
     def run(self):

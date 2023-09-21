@@ -120,6 +120,10 @@ class Checkmove:
         return [i for i in self.__queen(pos, col) if s(i) and check(i, pos)]
 
     def __primary_validation(self):
+        
+        # for i in range(64):
+
+        # if not __check_check()
         if self.type == 'P': 
             if self.target not in self.__pawn(self.pos, self.col): 
                 raise InvalidMove("pawn")
