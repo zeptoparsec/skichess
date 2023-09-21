@@ -33,9 +33,17 @@ def loop_music():
 
 # menu tree
 def menuTree():
+    def musicInterface(curr_dir):
+        music_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','music'])
+        music_list = ['Off'] + listdir(music_path) + ['Back']
+        music = menu.run(curr_dir, [i.title().strip() for i in music_list], 0)
+        
+        if music != len(music_list) - 1:
+            active_settings['music'] = music_list[music]
+
     music_process = Process(target=loop_music)
     if active_settings['music'] != 'Off': 
-        music_process.start()    
+        music_process.start()
 
     curr_dir = " _   _           _              ____                _                   _   _\n| | | |_ __   __| | ___ _ __   / ___|___  _ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __\n| | | | '_ \\ / _` |/ _ \\ '__| | |   / _ \\| '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ \n| |_| | | | | (_| |  __/ |    | |__| (_) | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |\n \\___/|_| |_|\\__,_|\\___|_|     \\____\\___/|_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|\n\n Home"
     select = [0, 0, 0, 0]
@@ -159,22 +167,15 @@ def menuTree():
 
                 elif option == 4: 
                     curr_dir += ' -> Music'
-                    music_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','music'])
-                    music_list = ['Off'] + listdir(music_path) + ['Back']
-                    music = menu.run(curr_dir, [i.title().strip() for i in music_list], 0)
-
-                    if music != len(music_list) - 1:
-                        active_settings['music'] = music_list[music]
-
+                    musicInterface(curr_dir)
                     if active_settings['music'] == 'Off': 
                         if music_process.is_alive():
                             music_process.terminate()
-                        
+                            music_process = Process(target=loop_music)
+            
                     else: 
                         if not music_process.is_alive():
-                            music_process = Process(target=loop_music)
                             music_process.start()
-
                     curr_dir = back(curr_dir, " -> Music")
 
                 elif option == 5:
@@ -192,5 +193,5 @@ def menuTree():
 
 if __name__ == '__main__':
     menuTree()
-
+    
 # exit message
