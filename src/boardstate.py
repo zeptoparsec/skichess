@@ -106,7 +106,7 @@ class Boardstate:
         elif not is_correct_piece: raise OpponentsPiece
         elif is_same_colour: raise CaptureOwnPiece
 
-        move_type = checkmove.validate(startpos, endpos)
+        move_type = checkmove.validate(startpos, endpos, False)
         if move_type == "promotion":
             promo = input("Promote to: ").upper()
             if promo not in "QBNR": raise InvalidPromotionInput

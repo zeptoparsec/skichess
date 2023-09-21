@@ -4,6 +4,7 @@ import operator
 class Checkmove:
     def __init__(self, board) -> None:
         self.board = board
+        self.ischeck = False
 
     def __pawn(self, pos, col):
         moves = list()
@@ -120,6 +121,12 @@ class Checkmove:
         return [i for i in self.__queen(pos, col) if s(i) and check(i, pos)]
 
     def __primary_validation(self):
+        if not self.ischeck:
+            for i in range(64):
+                if self.board[i].col == self.col and self.board[i].name == 'K':
+                    if not self.__check_check(i,i):
+                        raise InvalidMove("check")
+
         if self.type == 'P': 
             if self.target not in self.__pawn(self.pos, self.col): 
                 raise InvalidMove("pawn")
@@ -178,6 +185,12 @@ class Checkmove:
         return True
 
     def __check_check(self, target, pos):
+        boardcp = self.board[::]
+
+        boardcp[pos], boardcp[target] = boardcp[target], boardcp[pos]
+
+        cmove = Checkmove(boardcp)#to avoid polluting the current Checkmove object
+
         for i in range(64):
             if self.board[i].col == self.board[pos].col or self.board[i].col == 'N':
                 continue
@@ -187,14 +200,9 @@ class Checkmove:
                     return False
                 continue
 
-            boardcp = self.board[::]
-
-            boardcp[pos], boardcp[target] = boardcp[target], boardcp[pos]
-
-            cmove = Checkmove(boardcp)#to avoid polluting the current Checkmove object
 
             try:
-                cmove.validate(i, target)
+                cmove.validate(i, target, True)
             except Exception:
                 pass
             else:
@@ -240,13 +248,14 @@ class Checkmove:
         
         return False
                 
-    def validate(self, pos, target):
+    def validate(self, pos, target, ischeck):
         self.pos = pos
         self.target = target
         self.col = self.board[pos].col
         self.type = self.board[pos].name
         self.dy = self.target//8 - self.pos//8
         self.dx = self.target%8 - self.pos%8
+        self.ischeck = ischeck
 
         complex_move = False
         if self.type == 'P': 
