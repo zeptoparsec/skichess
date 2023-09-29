@@ -4,23 +4,14 @@ from time import sleep
 from os import listdir, path, remove
 import argparse
 import json
+from settings import settings
 from osCompat import escapeFilePaths
 
 parser = argparse.ArgumentParser(description='Simple chess game')
 parser.add_argument('-t',type=int,default=600)
 args = parser.parse_args()
 
-def loadSettings():
-    settings = open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','settings.json']),'r').read()
-    return json.loads(settings)
 
-def updateSettings(updates):
-    with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','settings.json']),'r+') as file:
-        file.seek(0)
-        json.dump(updates, file, indent=4)
-        file.truncate()
-
-active_settings = loadSettings()
 back = lambda path, remove: path[:-len(remove)] if path.endswith(remove) else path
 
 # menu tree
@@ -36,10 +27,10 @@ while True:
             [args.t, args.t], 
             True, 
             False, 
-            active_settings['legacy'], 
-            active_settings['fixed_board'],
-            active_settings['fixed_axis'],
-            active_settings['board_sound'],
+            settings.active_settings['legacy'], 
+            settings.active_settings['fixed_board'],
+            settings.active_settings['fixed_axis'],
+            settings.active_settings['board_sound'],
         ).run()
         sleep(1)
         curr_dir = back(curr_dir, ' -> New Game')
@@ -74,10 +65,10 @@ while True:
                                 Pvp([args.t, args.t], 
                                     True, 
                                     game_files[option], 
-                                    active_settings['legacy'],
-                                    active_settings['fixed_board'],
-                                    active_settings['fixed_axis'],
-                                    active_settings['board_sound']
+                                    settings.active_settings['legacy'],
+                                    settings.active_settings['fixed_board'],
+                                    settings.active_settings['fixed_axis'],
+                                    settings.active_settings['board_sound']
                                 ).run()
 
                     else: 
@@ -92,14 +83,16 @@ while True:
 
     elif option == 2: 
         curr_dir += ' -> Settings'
+        setf = lambda x: ('Enabled' if settings.active_settings[x] else 'Disabled')
         while True:
             option = menu.run(
                 curr_dir, 
                 [
-                    'Legacy:      ' + ('Enabled' if active_settings['legacy'] else 'Disabled'), 
-                    'Fix Board:   ' + ('Enabled' if active_settings['fixed_board'] else 'Disabled'),
-                    'Fix Axis:    ' + ('Enabled' if active_settings['fixed_axis'] else 'Disabled'), 
-                    'Board Sound: ' + ('Enabled' if active_settings['board_sound'] else 'Disabled'),
+                    'Legacy:      ' + setf('legacy'),
+                    'Fix Board:   ' + setf('fixed_board'),
+                    'Fix Axis:    ' + setf('fixed_axis'),
+                    'Board Sound: ' + setf('board_sound'),
+                    'Idle Compat: ',
                     'Back'
                 ], 
                 select[1]
@@ -107,24 +100,24 @@ while True:
             select[1] = option
 
             if option == 0: 
-                active_settings['legacy'] = not active_settings['legacy']
+                settings.active_settings['legacy'] = not settings.active_settings['legacy']
 
             elif option == 1: 
-                active_settings['fixed_board'] = not active_settings['fixed_board']
-                if active_settings['fixed_board']: 
-                    active_settings['fixed_axis'] = True
+                settings.active_settings['fixed_board'] = not settings.active_settings['fixed_board']
+                if settings.active_settings['fixed_board']: 
+                    settings.active_settings['fixed_axis'] = True
 
-            elif option == 2 and not active_settings['fixed_board']:
-                active_settings['fixed_axis'] = not active_settings['fixed_axis']
+            elif option == 2 and not settings.active_settings['fixed_board']:
+                settings.active_settings['fixed_axis'] = not settings.active_settings['fixed_axis']
 
             elif option == 3:
-                active_settings['board_sound'] = not active_settings['board_sound']
+                settings.active_settings['board_sound'] = not settings.active_settings['board_sound']
 
             elif option == 4:
                 curr_dir = back(curr_dir, " -> Settings")
                 select[1] = 0
                 break
 
-            updateSettings(active_settings)
+            settings.updateSettings(settings.active_settings)
 
     elif option == 3: break

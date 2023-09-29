@@ -1,5 +1,7 @@
 from errors import *
 from checkMove import CheckMove
+from playsound import playsound
+from os import path
 
 class Piece:
     def __init__(self, name, pos, val, col):
@@ -40,6 +42,9 @@ class BoardState:
             self.__board[i] = Piece('E', i, 0, 'N')
 
         self.__move_history = ''
+
+    def placeSound():
+        playsound(path.dirname(path.abspath(__file__)))
 
     def printBoard(self, legacy, turn, fixed_board, fixed_axis):
         if legacy:
