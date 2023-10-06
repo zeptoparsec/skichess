@@ -6,11 +6,13 @@ from time import sleep
 from errors import *
 from osCompat import *
 from boardState import BoardState
+from clear import clr
+from sound import sound
 
 board = BoardState()
 
 class Pvp:
-    def __init__(self, time, turn, load, legacy, fixed_board, fixed_axis, board_sound):
+    def __init__(self, time, turn, load, settings):
         self.x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
         self.y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
         self.p1 = {}
@@ -22,10 +24,11 @@ class Pvp:
         self.turn = turn
         self.load = load
         self.preview = False
-        self.legacy = legacy
-        self.fixed_board = fixed_board
-        self.fixed_axis = fixed_axis
-        self.board_sound = board_sound
+        self.legacy = settings['legacy']
+        self.fixed_board = settings['fixed_board']
+        self.fixed_axis = settings['fixed_axis']
+        self.idle_compat = settings['idle_compat']
+        self.board_sound = settings['board_sound']
 
     def __loadGame(self):
         with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r') as file:
@@ -163,7 +166,7 @@ class Pvp:
             except CheckMate: break
             except StaleMate: break
             except Exception as e: print("Invalid Input: "+str(e)+"!")
-            else: 
+            else:
                 if not self.preview: 
                     self.turn = not self.turn
                     board.unPreview()

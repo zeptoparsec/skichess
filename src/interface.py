@@ -27,10 +27,7 @@ while True:
             [args.t, args.t], 
             True, 
             False, 
-            settings.active_settings['legacy'], 
-            settings.active_settings['fixed_board'],
-            settings.active_settings['fixed_axis'],
-            settings.active_settings['board_sound'],
+            settings.active_settings
         ).run()
         sleep(1)
         curr_dir = back(curr_dir, ' -> New Game')
@@ -65,10 +62,7 @@ while True:
                                 Pvp([args.t, args.t], 
                                     True, 
                                     game_files[option], 
-                                    settings.active_settings['legacy'],
-                                    settings.active_settings['fixed_board'],
-                                    settings.active_settings['fixed_axis'],
-                                    settings.active_settings['board_sound']
+                                    settings.active_settings
                                 ).run()
 
                     else: 
@@ -92,7 +86,7 @@ while True:
                     'Fix Board:   ' + setf('fixed_board'),
                     'Fix Axis:    ' + setf('fixed_axis'),
                     'Board Sound: ' + setf('board_sound'),
-                    'Idle Compat: ',
+                    'Idle Compat: ' + setf('idle_compat'),
                     'Back'
                 ], 
                 select[1]
@@ -114,6 +108,9 @@ while True:
                 settings.active_settings['board_sound'] = not settings.active_settings['board_sound']
 
             elif option == 4:
+                settings.active_settings['idle_compat'] = not settings.active_settings['idle_compat']
+
+            elif option == 5:
                 curr_dir = back(curr_dir, " -> Settings")
                 select[1] = 0
                 break

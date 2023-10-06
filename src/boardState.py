@@ -1,5 +1,7 @@
 from errors import *
 from checkMove import CheckMove
+from settings import settings
+from sound import sound
 
 class Piece:
     def __init__(self, name, pos, val, col):
@@ -76,6 +78,8 @@ class BoardState:
             else: 
                 if turn: print(chr(64 + i),end=' ')
                 else: print(chr(73 - i),end=' ')
+            if settings.active_settings['idle_compat']:
+                print(end='  ')
         print()
 
     def restart(self):
@@ -84,6 +88,11 @@ class BoardState:
     def __move(self, start_pos, end_pos, move):
         if self.__board[start_pos].moved: self.__board[start_pos].moved_again = True
         else: self.__board[start_pos].moved = True
+
+        if self.__board[end_pos].name == 'E':
+            sound.movesound()
+        else:
+            sound.capturesound()
 
         self.__board[end_pos] = self.__board[start_pos]
         self.__board[start_pos] = Piece('E',start_pos,0,'N')

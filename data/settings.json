@@ -3,5 +3,6 @@
     "fixed_board": true,
     "fixed_axis": true,
     "music": "Off",
-    "board_sound": true
+    "board_sound": true,
+    "idle_compat": false
 }
