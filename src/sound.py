@@ -1,6 +1,7 @@
 from playsound import playsound
 from osCompat import escapeFilePaths
 from os import path
+from threading import Thread
 
 soundpath = path.dirname(path.abspath(__file__)) +escapeFilePaths(['..','data','sounds'], False)
 
@@ -11,9 +12,9 @@ class Sound:
         self.capture = self.soundpath+'capture.mp3'
 
     def movesound(self):
-        playsound(self.move)
+        Thread(target=playsound, args=(self.move,)).start()
 
     def capturesound(self):
-        playsound(self.capture)
+        Thread(target=playsound, args=(self.capture,)).start()
 
 sound = Sound()
