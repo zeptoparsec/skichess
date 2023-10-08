@@ -118,16 +118,11 @@ while True:
 
     elif option == 3: break
 
-
-                update_settings(active_settings)
-                select[1] = option
-
-        elif option == 4: 
-            if music_process.is_alive(): 
-                music_process.terminate()
+    elif option == 4: 
+        if music_process.is_alive(): 
+            music_process.terminate()
             exit()
 
 if __name__ == '__main__':
     menuTree()
-    
 # exit message
