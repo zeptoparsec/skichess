@@ -8,6 +8,8 @@ from osCompat import *
 from boardState import BoardState
 from clear import clr
 from sound import sound
+from player import Player
+from game import Game, board
 
 board = BoardState()
 
@@ -15,8 +17,6 @@ class Pvp:
     def __init__(self, time, turn, load, settings):
         self.x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
         self.y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
-        self.p1 = {}
-        self.p2 = {}
         self.then = 0
         self.now = 0
         self.time = time
@@ -38,8 +38,8 @@ class Pvp:
         fixed_axis = self.fixed_axis
         self.fixed_axis, self.fixed_board = False, False
         self.time = [data["wtime"], data["btime"]]
-        self.p1 = {'name': data["white"], 'col': 'W'}
-        self.p2 = {'name': data["black"], 'col': 'B'}
+        self.p1 = Player(data["white"], 'W', None)
+        self.p2 = Player(data["black"], 'B', None)
 
         for i in moves:
             self.__makemove(i)
@@ -54,8 +54,8 @@ class Pvp:
                 "moves": board.getMoveHistory(),
                 "wtime": self.time[0],
                 "btime": self.time[1],
-                "white": self.p1['name'] if self.p1['col'] == 'W' else self.p2['name'],
-                "black": self.p1['name'] if self.p1['col'] == 'B' else self.p2['name']
+                "white": self.p1.name if self.p1.col == 'W' else self.p2.name,
+                "black": self.p1.name if self.p1.col == 'B' else self.p2.name
             }
 
             file.seek(0)
@@ -88,30 +88,30 @@ class Pvp:
 
     def run(self):
         format_time = lambda s: ("{}:{}".format(s//60, s - (s//60)*60))
-        time_offset = lambda x: (abs(len(self.p1['name']) - len(self.p2['name']))) if len(self.p1['name'] if self.p1['col'] == x else self.p2['name']) < len(self.p1['name'] if self.p1['col'] != x else self.p2['name']) else 0
+        time_offset = lambda x: (abs(len(self.p1.name) - len(self.p2.name))) if len(self.p1.name if self.p1.col == x else self.p2.name) < len(self.p1.name if self.p1.col != x else self.p2.name) else 0
         clr()
         print("Chess pvp")
 
         if self.load == False:
-            self.p1 = {'name': input("Player one: "), 'col': random.choice(['W', 'B'])}
-            self.p2 = {'name': input("Player two: "), 'col': 'W' if self.p1['col'] == 'B' else 'B'}
-        else: 
-            self.__loadGame()
+            self.p1 = Player(input("Player one: "), random.choice(['W', 'B']), None)
+            self.p2 = Player(input("Player two: "), 'W' if self.p1.col == 'B' else 'B', None)
+        else: self._load_game()
 
         then = now = 0
+        
         while True:
             clr()
             print("Chess pvp")
             print("White: {}{} [{}]\nBlack: {}{} [{}]\n".format(
-                    self.p1['name'] if self.p1['col'] == 'W' else self.p2['name'], 
+                    self.p1.name if self.p1.col == 'W' else self.p2.name, 
                     ' '*time_offset('W'), 
                     format_time(self.time[0]),
-                    self.p1['name'] if self.p1['col'] == 'B' else self.p2['name'],
+                    self.p1.name if self.p1.col == 'B' else self.p2.name,
                     ' '*time_offset('B'), 
                     format_time(self.time[1])
                 )
             )
-
+          
             board.printBoard(self.legacy, self.turn, self.fixed_board, self.fixed_axis)
 
             print("\nCommands:")
@@ -119,12 +119,12 @@ class Pvp:
 
             if self.time[0] <= 0:
                 print('\nBlack ran out of time!')
-                print(self.p1['name'] if self.p1['col'] != 'B' else self.p2['name'], "wins!")
+                print(self.p1.name if self.p1.col != 'B' else self.p2.name, "wins!")
                 break
             
             if self.time[1] <= 0:
                 print('\nWhite ran out of time!')
-                print(self.p1['name'] if self.p1['col'] != 'W' else self.p2['name'], "wins!")
+                print(self.p1.name if self.p1.col != 'W' else self.p2.name, "wins!")
                 break
 
             now = int(datetime.now().timestamp())
@@ -166,6 +166,7 @@ class Pvp:
             except CheckMate: break
             except StaleMate: break
             except Exception as e: print("Invalid Input: "+str(e)+"!")
+
             else:
                 if not self.preview: 
                     self.turn = not self.turn

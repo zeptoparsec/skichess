@@ -20,4 +20,3 @@ def escapeFilePaths(path, file=True):
         xs.pop()
 
     return ''.join(list(chain.from_iterable(xs)))
-

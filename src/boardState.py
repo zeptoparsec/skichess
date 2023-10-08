@@ -111,13 +111,21 @@ class BoardState:
             if self.__board[i].name == 'H' and self.__board[i].col == 'N':
                 self.__board[i] = Piece('E', i ,0 , 'N')
 
+    def __getpiecevalue(self, piece):
+        if piece == 'P': return 1
+        if piece == 'R': return 5
+        if piece == 'N': return 3.2
+        if piece == 'B': return 3.3
+        if piece == 'Q': return 9
+        if piece == 'K': return 200
+                
     def makeMove(self, start_pos, end_pos, turn, move):
         checkmove = CheckMove(self.__board)
 
         is_same_colour =  self.__board[end_pos].col == self.__board[start_pos].col
         is_empty_space = self.__board[start_pos].col == 'N'
         is_correct_piece = True if turn == (self.__board[start_pos].col == 'W') else False
-
+        
         if is_empty_space: raise EmptyBox
         elif not is_correct_piece: raise OpponentsPiece
         elif is_same_colour: raise CaptureOwnPiece
@@ -162,8 +170,42 @@ class BoardState:
         self.__move_history = move_history
 
     def boardVal(self):
-        res = 0
-        for i in self.__board:
-            if i.col == 'W': res += i.val
-            elif i.col == 'B': res -= i.val
+        move_type = checkmove.validate(startpos, endpos, False)
+        if move_type == "promotion":
+            promo = input("Promote to: ").upper()
+            if promo not in "QBNR": raise InvalidPromotionInput
+    
+            self.__move(startpos, endpos, move)
+            self.__board[endpos].name = promo
+            self.__board[endpos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2
+            return
+            
+        elif move_type == "enpassant":
+            killpos = endpos + (8 if self.__board[startpos].col == 'W' else -8)
+            self.__move(startpos, endpos, move)
+            self.__board[killpos] = Piece('E',startpos,0,'N',[])
+            return
+
+        elif move_type == "castling":
+            offset = 0 if self.__board[startpos].col == 'B' else 56
+            self.__move(startpos, endpos, move)
+            if endpos == 1 + offset:
+                startpos = 0 + offset
+                endpos = 2 + offset
+            elif endpos == 6 + offset:
+                startpos = 7 + offset
+                endpos = 5 + offset
+            self.__move(startpos, endpos, None)
+            return
+            
+        self.__move(startpos, endpos, move)
+        return
+
+    def getMoveHistory(self):
+        return self.__movehistory
+
+    def loadGame(self, movehistory):
+        self.__movehistory = movehistory
+
+    def boardval(self):
         return res

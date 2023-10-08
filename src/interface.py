@@ -11,7 +11,6 @@ parser = argparse.ArgumentParser(description='Simple chess game')
 parser.add_argument('-t',type=int,default=600)
 args = parser.parse_args()
 
-
 back = lambda path, remove: path[:-len(remove)] if path.endswith(remove) else path
 
 # menu tree
@@ -118,3 +117,17 @@ while True:
             settings.updateSettings(settings.active_settings)
 
     elif option == 3: break
+
+
+                update_settings(active_settings)
+                select[1] = option
+
+        elif option == 4: 
+            if music_process.is_alive(): 
+                music_process.terminate()
+            exit()
+
+if __name__ == '__main__':
+    menuTree()
+    
+# exit message
