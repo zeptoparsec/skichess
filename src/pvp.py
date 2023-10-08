@@ -7,7 +7,6 @@ from errors import *
 from osCompat import *
 from boardState import BoardState
 from clear import clr
-from sound import sound
 from player import Player
 from game import Game, board
 
