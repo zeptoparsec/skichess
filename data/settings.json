@@ -1,7 +1,7 @@
 {
     "legacy": false,
-    "fixed_board": true,
-    "fixed_axis": true,
+    "fixed_board": false,
+    "fixed_axis": false,
     "music": "Off",
     "board_sound": true,
     "idle_compat": false
