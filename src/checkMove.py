@@ -1,10 +1,10 @@
 from errors import *
 import operator
 
-class Checkmove:
+class CheckMove:
     def __init__(self, board) -> None:
         self.board = board
-        self.ischeck = False
+        self.is_check = False
 
     def __pawn(self, pos, col):
         moves = list()
@@ -30,31 +30,29 @@ class Checkmove:
         
     def __rook(self, pos, col):
         moves = list()
-        xbounds = lambda x: (0 <= x <= 63) and (pos//8 != x//8)
-        ybounds = lambda x: (0 <= x <= 63) and (pos//8 == x//8)
+        xBounds = lambda x: (0 <= x <= 63) and (pos//8 != x//8)
+        yBounds = lambda x: (0 <= x <= 63) and (pos//8 == x//8)
 
         i = 1 #up
-        while xbounds(pos - 8*i) and self.board[pos - 8*i].col != col:
+        while xBounds(pos - 8*i) and self.board[pos - 8*i].col != col:
             moves.append(pos - 8*i)
             if self.board[pos - 8*i].col != 'N': break
             i += 1
 
         i = 1 #down
-        while xbounds(pos + 8*i) and self.board[pos + 8*i].col != col:
+        while xBounds(pos + 8*i) and self.board[pos + 8*i].col != col:
             moves.append(pos + 8*i)
             if self.board[pos + 8*i].col != 'N': break
             i += 1
-            
 
         i = 1 #right
-        while ybounds(pos + i) and self.board[pos + i].col != col:
+        while yBounds(pos + i) and self.board[pos + i].col != col:
             moves.append(pos + i)
             if self.board[pos + i].col != 'N': break
             i += 1
             
-        
         i = 1 #left
-        while ybounds(pos - i) and self.board[pos - i].col != col:
+        while yBounds(pos - i) and self.board[pos - i].col != col:
             moves.append(pos - i)
             if self.board[pos - i].col != 'N': break
             i += 1
@@ -117,79 +115,79 @@ class Checkmove:
 
     def __king(self, pos, col):
         s = lambda x: abs(pos//8 - x//8) <= 1 and abs(pos%8 - x%8) <= 1
-        check = lambda x, y: self.__check_check(x, y)
+        check = lambda x, y: self.__checkCheck(x, y)
         return [i for i in self.__queen(pos, col) if s(i) and check(i, pos)]
 
-    def __primary_validation(self):
-        if not self.ischeck:
+    def __primaryValidation(self):
+        if not self.is_check:
             for i in range(64):
                 if self.board[i].col == self.col and self.board[i].name == 'K':
-                    if not self.__check_check(i,i):
+                    if not self.__checkCheck(i,i):
                         raise InvalidMove("check")
 
         if self.type == 'P': 
-            if self.target not in self.__pawn(self.pos, self.col): 
+            if self.end_pos not in self.__pawn(self.start_pos, self.col): 
                 raise InvalidMove("pawn")
 
         elif self.type == 'R': 
-            if self.target not in self.__rook(self.pos, self.col): 
+            if self.end_pos not in self.__rook(self.start_pos, self.col): 
                 raise InvalidMove("rook")
         
         elif self.type == 'N':
-            if self.target not in self.__knight(self.pos, self.col): 
+            if self.end_pos not in self.__knight(self.start_pos, self.col): 
                 raise InvalidMove("knight")
 
         elif self.type == 'B':
-            if self.target not in self.__bishop(self.pos, self.col): 
+            if self.end_pos not in self.__bishop(self.start_pos, self.col): 
                 raise InvalidMove("bishop")
 
         elif self.type == 'Q':
-            if self.target not in self.__queen(self.pos, self.col): 
+            if self.end_pos not in self.__queen(self.start_pos, self.col): 
                 raise InvalidMove("queen")
 
         elif self.type == 'K':
-            if self.target not in self.__king(self.pos, self.col): 
+            if self.end_pos not in self.__king(self.start_pos, self.col): 
                 raise InvalidMove("king")
 
         else: raise Exception
         return True
 
     def __promotion(self):
-        if self.target not in self.__pawn(self.pos, self.board[self.pos].col): return False
-        offset = 0 if self.board[self.pos].col == 'W' else 56
-        return offset + 0 <= self.target <= offset + 7
+        if self.end_pos not in self.__pawn(self.start_pos, self.board[self.start_pos].col): return False
+        offset = 0 if self.board[self.start_pos].col == 'W' else 56
+        return offset + 0 <= self.end_pos <= offset + 7
     
     def __castling(self): #validation pending
-        offset = 0 if self.board[self.pos].col == 'B' else 56
-        if self.type != 'K' or self.board[self.pos].moved: return False
-        if self.pos != 4 + offset: return False
+        offset = 0 if self.board[self.start_pos].col == 'B' else 56
+        if self.type != 'K' or self.board[self.start_pos].moved: return False
+        if self.start_pos != 4 + offset: return False
 
-        if self.pos == 4 + offset:
-            if self.target == 1 + offset:
+        if self.start_pos == 4 + offset:
+            if self.end_pos == 1 + offset:
                 if self.board[0 + offset].moved: return False
                 for i in range(1, 4):
                     if self.board[i + offset].col != 'N': return False
-            elif self.target == 6 + offset:
+
+            elif self.end_pos == 6 + offset:
                 if self.board[7 + offset].moved: return False
                 for i in range(5, 7):
                     if self.board[i + offset].col != 'N': return False
+
             else: return False
         return True
     
     def __enpassant(self):
-        offset = 24 if self.board[self.pos].col == 'W' else 32
-        killpos = self.target + (8 if self.board[self.pos].col == 'W' else -8)
-        if self.board[killpos].col != 'N': return False
-        if not((self.dx == 1 or self.dx == -1) and self.dy == (1 if self.board[self.pos].col == 'B' else -1)): return False
-        if not (offset <= self.pos <= 7 + offset) or self.board[killpos].moved_again or self.type != 'P': return False
+        offset = 24 if self.board[self.start_pos].col == 'W' else 32
+        kill_pos = self.end_pos + (8 if self.board[self.start_pos].col == 'W' else -8)
+        if self.board[kill_pos].col != 'N': return False
+        if not((self.dx == 1 or self.dx == -1) and self.dy == (1 if self.board[self.start_pos].col == 'B' else -1)): return False
+        if not (offset <= self.start_pos <= 7 + offset) or self.board[kill_pos].moved_again or self.type != 'P': return False
         return True
 
-    def __check_check(self, target, pos):
+    def __checkCheck(self, target, pos):
         boardcp = self.board[::]
-
         boardcp[pos], boardcp[target] = boardcp[target], boardcp[pos]
-
-        cmove = Checkmove(boardcp)#to avoid polluting the current Checkmove object
+        cmove = CheckMove(boardcp)#to avoid polluting the current Checkmove object
 
         for i in range(64):
             if self.board[i].col == self.board[pos].col or self.board[i].col == 'N':
@@ -200,70 +198,68 @@ class Checkmove:
                     return False
                 continue
 
-
-            try:
-                cmove.validate(i, target, True)
-            except Exception:
-                pass
-            else:
-                return False
+            try: cmove.validate(i, target, True)
+            except Exception: pass
+            else: return False
 
         return True
 
     def check(self, col): # test it
-        kingpos = 0
+        king_pos = 0
         for i in range(64):
             if self.board[i].name == 'K' and self.board[i].col == col:
-                kingpos = i
+                king_pos = i
                 break
         else: raise IllegalMove
 
-        for i in self.__knight(kingpos, None):
+        for i in self.__knight(king_pos, None):
             if self.board[i].name == 'N' and self.board[i].col not in col + 'N':
                 return True
 
-        for i in self.__rook(kingpos, None):
+        for i in self.__rook(king_pos, None):
             if self.board[i].name in 'QR' and self.board[i].col not in col + 'N':
                 return True
 
-        for i in self.__bishop(kingpos, None):
+        for i in self.__bishop(king_pos, None):
             if self.board[i].name in 'QB' and self.board[i].col not in col + 'N':
                 return True
 
-        for i in self.__king(kingpos, None):
+        for i in self.__king(king_pos, None):
             if self.board[i].name in 'K' and self.board[i].col not in col + 'N':
                 return True
 
-        s = lambda x: abs(kingpos//8 - x//8) <= 1 and abs(kingpos%8 - x%8) <= 1
+        s = lambda x: abs(king_pos//8 - x//8) <= 1 and abs(king_pos%8 - x%8) <= 1
         if col == 'B':
-            if self.board[kingpos + (8 - 1)].name == 'P' and self.board[kingpos + (8 - 1)].col == 'W' and s(kingpos + (8 - 1)):
+            if self.board[king_pos + (8 - 1)].name == 'P' and self.board[king_pos + (8 - 1)].col == 'W' and s(king_pos + (8 - 1)):
                 return True
-            elif self.board[kingpos + (8 + 1)].name == 'P' and self.board[kingpos + (8 + 1)].col == 'W' and s(kingpos + (8 + 1)):
+            elif self.board[king_pos + (8 + 1)].name == 'P' and self.board[king_pos + (8 + 1)].col == 'W' and s(king_pos + (8 + 1)):
                 return True
         elif col == 'W':
-            if self.board[kingpos - (8 - 1)].name == 'P' and self.board[kingpos - (8 - 1)].col == 'B' and s(kingpos - (8 - 1)):
+            if self.board[king_pos - (8 - 1)].name == 'P' and self.board[king_pos - (8 - 1)].col == 'B' and s(king_pos - (8 - 1)):
                 return True
-            elif self.board[kingpos - (8 + 1)].name == 'P' and self.board[kingpos - (8 + 1)].col == 'W' and s(kingpos - (8 + 1)):
+            elif self.board[king_pos - (8 + 1)].name == 'P' and self.board[king_pos - (8 + 1)].col == 'W' and s(king_pos - (8 + 1)):
                 return True
         
         return False
                 
-    def validate(self, pos, target, ischeck):
-        self.pos = pos
-        self.target = target
-        self.col = self.board[pos].col
-        self.type = self.board[pos].name
-        self.dy = self.target//8 - self.pos//8
-        self.dx = self.target%8 - self.pos%8
-        self.ischeck = ischeck
+    def validate(self, start_pos, end_pos, is_check):
+        self.start_pos = start_pos
+        self.end_pos = end_pos
+        self.col = self.board[start_pos].col
+        self.type = self.board[start_pos].name
+        self.dy = self.end_pos//8 - self.start_pos//8
+        self.dx = self.end_pos%8 - self.start_pos%8
+        self.is_check = is_check
 
         complex_move = False
         if self.type == 'P': 
             if self.__promotion(): complex_move = "promotion"
             elif self.__enpassant(): complex_move = "enpassant"
-        elif self.type == 'K' and self.__castling(): complex_move = "castling"
+
+        elif self.type == 'K' and self.__castling(): 
+            complex_move = "castling"
         
-        if not complex_move: return self.__primary_validation()
+        if not complex_move: return self.__primaryValidation()
         else: return complex_move
     
     def preview(self, pos): 

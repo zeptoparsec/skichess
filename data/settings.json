@@ -1,7 +1,8 @@
 {
     "legacy": false,
-    "fixed_board": false,
+    "fixed_board": true,
     "fixed_axis": true,
-    "music": "good night.mp3",
-    "board_sound": true
+    "music": "Off",
+    "board_sound": true,
+    "idle_compat": false
 }

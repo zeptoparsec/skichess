@@ -1,9 +1,11 @@
 from pynput.keyboard import Key, Listener
-from oscompat import clr
+from clear import clr
 from time import sleep
+from settings import settings
 
 def menu(title, options, setpointer):
     pointer = setpointer
+
     def print_options():
         clr()
 
@@ -29,7 +31,8 @@ def on_key_updown(key):
     if key == Key.up: menucp[1](-1)
     elif key == Key.down: menucp[1](1)
     elif key == Key.enter: 
-        input()
+        if not settings.active_settings["idle_compat"]:
+            input()
         return False
     menucp[0]()
 
