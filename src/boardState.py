@@ -2,15 +2,7 @@ from errors import *
 from checkMove import CheckMove
 from settings import settings
 from sound import sound
-
-class Piece:
-    def __init__(self, name, pos, val, col):
-        self.name = name
-        self.pos = pos
-        self.val = val
-        self.col = col
-        self.moved = False
-        self.moved_again = False
+from piece import Piece
 
 class BoardState:
     def __init__(self):
