@@ -74,6 +74,9 @@ class BoardState:
                 print(end='  ')
         print()
 
+        if self.__move_history == '' and settings.active_settings['sound']:
+            sound.startGameSound()
+
     def restart(self):
         self.__init__()
 
@@ -81,10 +84,11 @@ class BoardState:
         if self.__board[start_pos].moved: self.__board[start_pos].moved_again = True
         else: self.__board[start_pos].moved = True
 
-        if self.__board[end_pos].name == 'E':
-            sound.movesound()
-        else:
-            sound.capturesound()
+        if settings.active_settings['sound']:
+            if self.__board[end_pos].name == 'E':
+                sound.moveSound()
+            else:
+                sound.captureSound()
 
         self.__board[end_pos] = self.__board[start_pos]
         self.__board[start_pos] = Piece('E',start_pos,0,'N')
@@ -102,14 +106,6 @@ class BoardState:
         for i in range(64):
             if self.__board[i].name == 'H' and self.__board[i].col == 'N':
                 self.__board[i] = Piece('E', i ,0 , 'N')
-
-    def __getpiecevalue(self, piece):
-        if piece == 'P': return 1
-        if piece == 'R': return 5
-        if piece == 'N': return 3.2
-        if piece == 'B': return 3.3
-        if piece == 'Q': return 9
-        if piece == 'K': return 200
                 
     def makeMove(self, start_pos, end_pos, turn, move):
         checkmove = CheckMove(self.__board)

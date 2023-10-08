@@ -3,6 +3,7 @@ import json
 from os import path
 from osCompat import escapeFilePaths
 from boardState import BoardState
+from settings import settings
 
 board = BoardState()
 
@@ -21,7 +22,7 @@ class Game:
         self.fixed_board = settings['fixed_board']
         self.fixed_axis = settings['fixed_axis']
         self.idle_compat = settings['idle_compat']
-        self.board_sound = settings['board_sound']
+        self.board_sound = settings['sound']
         self.p1 = Player('','',None)
         self.p2 = Player('','',None)
 
@@ -38,8 +39,51 @@ class Game:
             file.seek(0)
             json.dump(lines, file, indent=4)
 
-    def _axisToPos(self, x, y):
+    def _loadGame(self):
+        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r') as file:
+            data = json.load(file)
+            moves = data["moves"].split()
+
+        fixed_axis = self.fixed_axis
+        self.fixed_axis, self.fixed_board = False, False
+        self.time = [data["wtime"], data["btime"]]
+        self.p1 = Player(data["white"], 'W', None)
+        self.p2 = Player(data["black"], 'B', None)
+
+        temp = settings.active_settings['sound']
+        settings.active_settings['sound'] = False
+        settings.updateSettings(settings.active_settings)
+        for i in moves:
+            self._makeMove(i)
+            self.turn = not self.turn
+            
+        settings.active_settings['sound'] = temp
+        settings.updateSettings(settings.active_settings)
+
+        board.loadGame(' '.join([str(i) for i in moves]) + ' ')
+        self.fixed_axis = fixed_axis
+
+    def __axisToPos(self, x, y):
         newpos = self.x_axis[x] + self.y_axis[y]*8 - 1
         if not self.fixed_board and (self.fixed_axis and not self.turn):
             newpos = 63 - newpos
         return newpos
+
+    def _makeMove(self, move):
+        if not (move[0].isalpha and move[1].isdigit()): raise Exception
+        self.preview = False
+        board.unPreview()
+        start_pos = self.__axisToPos(move[0], move[1])
+
+        if len(move) == 2:
+            self.preview = True
+            board.preview(start_pos)
+
+        elif len(move) == 4 : 
+            if not (move[2].isalpha and move[3].isdigit()): raise Exception
+            end_pos = self.__axisToPos(move[2], move[3])
+            if not self.fixed_board and (self.fixed_axis and not self.turn): 
+                move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
+            board.makeMove(start_pos, end_pos, self.turn, move.lower())
+
+        else: raise Exception

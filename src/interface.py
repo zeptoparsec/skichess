@@ -84,7 +84,7 @@ while True:
                     'Legacy:      ' + setf('legacy'),
                     'Fix Board:   ' + setf('fixed_board'),
                     'Fix Axis:    ' + setf('fixed_axis'),
-                    'Board Sound: ' + setf('board_sound'),
+                    'Sound:       ' + setf('sound'),
                     'Idle Compat: ' + setf('idle_compat'),
                     'Back'
                 ], 
@@ -104,7 +104,7 @@ while True:
                 settings.active_settings['fixed_axis'] = not settings.active_settings['fixed_axis']
 
             elif option == 3:
-                settings.active_settings['board_sound'] = not settings.active_settings['board_sound']
+                settings.active_settings['sound'] = not settings.active_settings['sound']
 
             elif option == 4:
                 settings.active_settings['idle_compat'] = not settings.active_settings['idle_compat']

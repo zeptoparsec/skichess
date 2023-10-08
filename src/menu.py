@@ -15,7 +15,6 @@ def menu(title, options, setpointer):
             print(' ' + options[i], ' '*(len(max(options, key=len)) - len(options[i])),end='')
             print('<') if i == pointer else print()
 
-
     def shift_pointer(shift):
         nonlocal pointer
         pointer = (pointer + shift) % len(options)
