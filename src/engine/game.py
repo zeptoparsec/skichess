@@ -1,9 +1,9 @@
-from player import Player
 import json
 from os import path
-from osCompat import escapeFilePaths
-from boardState import BoardState
-from settings import settings
+from compat.osCompat import escapeFilePaths
+from board.boardState import BoardState
+from engine.settings import settings
+from engine.player import Player
 
 board = BoardState()
 
@@ -27,32 +27,33 @@ class Game:
         self.p2 = Player('','',None)
 
     def _saveGame(self, move):
-        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(["..","data","games", move[5:]+'.json']).lstrip(), 'w') as file:
+        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..', '..', 'data','games', move[5:]+'.json']).lstrip(), 'w') as file:
             lines = {
-                "moves": board.getMoveHistory(),
-                "wtime": self.time[0],
-                "btime": self.time[1],
-                "white": self.p1.name if self.p1.col == 'W' else self.p2.name,
-                "black": self.p1.name if self.p1.col == 'B' else self.p2.name
+                'moves': board.getMoveHistory(),
+                'wtime': self.time[0],
+                'btime': self.time[1],
+                'white': self.p1.name if self.p1.col == 'W' else self.p2.name,
+                'black': self.p1.name if self.p1.col == 'B' else self.p2.name
             }
 
             file.seek(0)
             json.dump(lines, file, indent=4)
 
     def _loadGame(self):
-        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', self.load]),'r') as file:
+        with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..', '..', 'data','games', self.load]),'r') as file:
             data = json.load(file)
-            moves = data["moves"].split()
+            moves = data['moves'].split()
 
         fixed_axis = self.fixed_axis
         self.fixed_axis, self.fixed_board = False, False
-        self.time = [data["wtime"], data["btime"]]
-        self.p1 = Player(data["white"], 'W', None)
-        self.p2 = Player(data["black"], 'B', None)
+        self.time = [data['wtime'], data['btime']]
+        self.p1 = Player(data['white'], 'W', None)
+        self.p2 = Player(data['black'], 'B', None)
 
         temp = settings.active_settings['sound']
         settings.active_settings['sound'] = False
         settings.updateSettings(settings.active_settings)
+        
         for i in moves:
             self._makeMove(i)
             self.turn = not self.turn

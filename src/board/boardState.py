@@ -1,8 +1,8 @@
-from errors import *
-from checkMove import CheckMove
-from settings import settings
-from sound import sound
-from piece import Piece
+from engine.errors import *
+from board.checkMove import CheckMove
+from engine.settings import settings
+from ui.sound import sound
+from board.piece import Piece
 
 class BoardState:
     def __init__(self):
@@ -74,8 +74,8 @@ class BoardState:
                 print(end='  ')
         print()
 
-        if self.__move_history == '' and settings.active_settings['sound']:
-            sound.startGameSound()
+        if self.__move_history == '':
+            sound.boardStartGameSound()
 
     def restart(self):
         self.__init__()
@@ -84,11 +84,10 @@ class BoardState:
         if self.__board[start_pos].moved: self.__board[start_pos].moved_again = True
         else: self.__board[start_pos].moved = True
 
-        if settings.active_settings['sound']:
-            if self.__board[end_pos].name == 'E':
-                sound.moveSound()
-            else:
-                sound.captureSound()
+        if self.__board[end_pos].name == 'E':
+            sound.boardMoveSound()
+        else:
+            sound.boardCaptureSound()
 
         self.__board[end_pos] = self.__board[start_pos]
         self.__board[start_pos] = Piece('E',start_pos,0,'N')

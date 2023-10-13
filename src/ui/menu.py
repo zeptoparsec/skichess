@@ -1,7 +1,8 @@
 from pynput.keyboard import Key, Listener
-from clear import clr
+from compat.clear import clr
 from time import sleep
-from settings import settings
+from engine.settings import settings
+from ui.sound import sound
 
 def menu(title, options, setpointer):
     pointer = setpointer
@@ -27,12 +28,17 @@ def menu(title, options, setpointer):
     return [print_options, shift_pointer, call_page]
 
 def on_key_updown(key):
-    if key == Key.up: menucp[1](-1)
-    elif key == Key.down: menucp[1](1)
+    if key == Key.up:
+        menucp[1](-1)
+        sound.menuSelectSound()
+    elif key == Key.down:
+        menucp[1](1)
+        sound.menuSelectSound()
     elif key == Key.enter: 
         if not settings.active_settings["idle_compat"]:
             input()
         return False
+
     menucp[0]()
 
 def run(title, options, pointer):

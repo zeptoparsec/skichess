@@ -1,11 +1,11 @@
 from datetime import datetime
 import random
 from time import sleep
-from errors import *
-from osCompat import *
-from clear import clr
-from player import Player
-from game import Game, board
+from engine.errors import *
+from compat.osCompat import *
+from compat.clear import clr
+from engine.player import Player
+from engine.game import Game, board
 
 class Pvp(Game):
     def run(self):

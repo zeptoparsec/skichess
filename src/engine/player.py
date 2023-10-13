@@ -3,4 +3,3 @@ class Player:
         self.name = name
         self.col = col
         self.ip = ip
-    

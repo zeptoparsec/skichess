@@ -1,6 +1,6 @@
 import json
 from os import path
-from osCompat import escapeFilePaths
+from compat.osCompat import escapeFilePaths
 
 class Settings:
     def __init__(self, path):
@@ -17,5 +17,4 @@ class Settings:
             json.dump(updates, file, indent=4)
             file.truncate()
 
-settings = Settings(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','settings.json']))
-
+settings = Settings(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','..','data','settings.json']))

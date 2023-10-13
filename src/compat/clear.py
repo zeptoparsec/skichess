@@ -1,4 +1,4 @@
-from settings import settings
+from engine.settings import settings
 from os import name, system
 
 def clr():
