@@ -17,7 +17,7 @@ class Sound:
 
     def __playsound(self, sound):
         if settings.active_settings['sound']:
-            Thread(target=playsound, args=(sound,)).start()
+            Thread(target=playsound, args=(sound,)).start() # this thing sometimes work and sometimes dosent
 
     def boardStartGameSound(self):
         self.__playsound(self.board_start_game)

@@ -4,6 +4,8 @@ class IllegalMove(Exception):
 class OpponentsPiece(Exception):
     pass
 
+class OpponentPreview(Exception):
+    pass
 class EmptyBox(Exception):
     pass
 

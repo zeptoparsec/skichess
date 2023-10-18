@@ -23,8 +23,8 @@ class Game:
         self.fixed_axis = settings['fixed_axis']
         self.idle_compat = settings['idle_compat']
         self.board_sound = settings['sound']
-        self.p1 = Player('','',None)
-        self.p2 = Player('','',None)
+        self.p1 = Player('','')
+        self.p2 = Player('','')
 
     def _saveGame(self, move):
         with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..', '..', 'data','games', move[5:]+'.json']).lstrip(), 'w') as file:
@@ -44,11 +44,11 @@ class Game:
             data = json.load(file)
             moves = data['moves'].split()
 
-        fixed_axis = self.fixed_axis
+        fixed_axis, fixed_board = self.fixed_axis, self.fixed_board
         self.fixed_axis, self.fixed_board = False, False
         self.time = [data['wtime'], data['btime']]
-        self.p1 = Player(data['white'], 'W', None)
-        self.p2 = Player(data['black'], 'B', None)
+        self.p1 = Player(data['white'], 'W')
+        self.p2 = Player(data['black'], 'B')
 
         temp = settings.active_settings['sound']
         settings.active_settings['sound'] = False
@@ -62,7 +62,7 @@ class Game:
         settings.updateSettings(settings.active_settings)
 
         board.loadGame(' '.join([str(i) for i in moves]) + ' ')
-        self.fixed_axis = fixed_axis
+        self.fixed_axis, self.fixed_board = fixed_axis, fixed_board
 
     def __axisToPos(self, x, y):
         newpos = self.x_axis[x] + self.y_axis[y]*8 - 1
@@ -70,15 +70,17 @@ class Game:
             newpos = 63 - newpos
         return newpos
 
-    def _makeMove(self, move):
+    def _backupMakeMove(self, move):
         if not (move[0].isalpha and move[1].isdigit()): raise Exception
-        self.preview = False
-        board.unPreview()
         start_pos = self.__axisToPos(move[0], move[1])
 
-        if len(move) == 2:
+        if move == 'h':
+            board.highlight()
             self.preview = True
-            board.preview(start_pos)
+
+        elif len(move) == 2:
+            if board.preview(start_pos, 'W' if self.turn else 'B') is True:
+                self.preview = True
 
         elif len(move) == 4 : 
             if not (move[2].isalpha and move[3].isdigit()): raise Exception
@@ -88,3 +90,34 @@ class Game:
             board.makeMove(start_pos, end_pos, self.turn, move.lower())
 
         else: raise Exception
+
+    def __validateMove(self, move):
+        for i, v in enumerate(move):
+            if i % 2 == 0:
+                if not v.isalpha():
+                    raise Exception
+            else:
+                if not v.isdigit():
+                    raise Exception
+
+    def _makeMove(self, move):
+        self.__validateMove(move)
+        if move == 'h':
+            board.highlight()
+            self.preview = True
+            return
+
+        start_pos = self.__axisToPos(move[0], move[1])
+        if len(move) == 2:
+            if board.preview(start_pos, 'W' if self.turn else 'B') is True:
+                self.preview = True
+            return
+
+        elif len(move) == 4:
+            self.preview = False
+            end_pos = self.__axisToPos(move[2], move[3])
+            if not self.fixed_board and (self.fixed_axis and not self.turn): 
+                move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
+            
+            board.makeMove(start_pos, end_pos, self.turn, move)
+            return

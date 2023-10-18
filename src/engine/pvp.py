@@ -6,6 +6,7 @@ from compat.osCompat import *
 from compat.clear import clr
 from engine.player import Player
 from engine.game import Game, board
+from traceback import print_exc
 
 class Pvp(Game):
     def run(self):
@@ -15,8 +16,8 @@ class Pvp(Game):
         print("Chess pvp")
 
         if self.load == False:
-            self.p1 = Player(input("Player one: "), random.choice(['W', 'B']), None)
-            self.p2 = Player(input("Player two: "), 'W' if self.p1.col == 'B' else 'B', None)
+            self.p1 = Player(input("Player one: "), random.choice(['W', 'B']))
+            self.p2 = Player(input("Player two: "), 'W' if self.p1.col == 'B' else 'B')
         else: self._loadGame()
 
         then = now = 0
@@ -37,7 +38,7 @@ class Pvp(Game):
             board.printBoard(self.legacy, self.turn, self.fixed_board, self.fixed_axis)
 
             print("\nCommands:")
-            print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1\n")
+            print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1, h\n")
 
             if self.time[0] <= 0:
                 print('\nBlack ran out of time!')
@@ -70,9 +71,7 @@ class Pvp(Game):
 
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise UnNamedFile
-
                     self._saveGame(move)
-
                     board.restart()
                     return
 
@@ -81,18 +80,18 @@ class Pvp(Game):
             except InvalidMove as e: print("Invalid Move:", e, "cannot move there")
             except IllegalMove: print("Check!")
             except OpponentsPiece: print("Cannot move opponent's piece")
+            except OpponentPreview: print("Cannot preview opponent's piece")
             except EmptyBox: print("There is no piece there")
             except CaptureOwnPiece: print("Cannot capture your own piece")
             except UnNamedFile: print("File name is required")
             except InvalidPromotionInput: print("Invalid piece: Use Q, B, N, R")
             except CheckMate: break
             except StaleMate: break
-            except Exception as e: print("Invalid Input: "+str(e)+"!")
-
+            except Exception: 
+                print(print_exc())
             else:
                 if not self.preview: 
                     self.turn = not self.turn
-                    board.unPreview()
                 continue
             sleep(3)
             self.time[int(not self.turn)] -= 3

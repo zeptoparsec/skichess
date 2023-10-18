@@ -80,7 +80,26 @@ class BoardState:
     def restart(self):
         self.__init__()
 
+    def preview(self, pos, col):
+        if self.__board[pos].col == 'N': raise EmptyBox
+        if self.__board[pos].col != col: raise OpponentPreview
+        self.__unPreview()
+        for i in CheckMove(self.__board, None).preview(pos):
+            if self.__board[i].col == 'N': self.__board[i] = Piece('H', i, 0, 'N')
+        return True
+
+    def __unPreview(self):
+        for i in range(64):
+            if self.__board[i].name == 'H' and self.__board[i].col == 'N':
+                self.__board[i] = Piece('E', i ,0 , 'N')
+
+    def highlight(self):
+        for i in range(64):
+            if self.__board[i].col == 'N':
+                self.__board[i] = Piece('H', i, 0, 'N')
+
     def __move(self, start_pos, end_pos, move):
+        self.__unPreview()
         if self.__board[start_pos].moved: self.__board[start_pos].moved_again = True
         else: self.__board[start_pos].moved = True
 
@@ -93,21 +112,10 @@ class BoardState:
         self.__board[start_pos] = Piece('E',start_pos,0,'N')
 
         if move != None: self.__move_history += move+' '
-
-    def preview(self, pos):
-        checkmove = CheckMove(self.__board)
-        if self.__board[pos].col == 'N': raise EmptyBox
-        poses = checkmove.preview(pos)
-        for i in poses:
-            if self.__board[i].col == 'N': self.__board[i] = Piece('H', i, 0, 'N')
-
-    def unPreview(self):
-        for i in range(64):
-            if self.__board[i].name == 'H' and self.__board[i].col == 'N':
-                self.__board[i] = Piece('E', i ,0 , 'N')
                 
     def makeMove(self, start_pos, end_pos, turn, move):
-        checkmove = CheckMove(self.__board)
+        prev_move = None if len(self.__move_history.split()) == 0 else self.__move_history.split()[-1]
+        checkmove = CheckMove(self.__board, prev_move)
 
         is_same_colour =  self.__board[end_pos].col == self.__board[start_pos].col
         is_empty_space = self.__board[start_pos].col == 'N'
@@ -117,7 +125,7 @@ class BoardState:
         elif not is_correct_piece: raise OpponentsPiece
         elif is_same_colour: raise CaptureOwnPiece
 
-        move_type = checkmove.validate(start_pos, end_pos, False)
+        move_type = checkmove.validate(start_pos, end_pos)
         if move_type == "promotion":
             promo = input("Promote to: ").upper()
             if promo not in "QBNR": raise InvalidPromotionInput
@@ -133,7 +141,7 @@ class BoardState:
             self.__board[killpos] = Piece('E',start_pos,0,'N')
             return
 
-        elif move_type == "castling":
+        elif move_type == "castling": # not working
             offset = 0 if self.__board[start_pos].col == 'B' else 56
             self.__move(start_pos, end_pos, move)
             if end_pos == 1 + offset:
