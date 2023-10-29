@@ -1,5 +1,4 @@
 from engine.errors import *
-import operator
 
 class CheckMove:
     def __init__(self, board) -> None:
