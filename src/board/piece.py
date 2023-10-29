@@ -1,5 +1,5 @@
 class Piece:
-    def __init__(self, name, pos, val, col):
+    def __init__(self, name, pos, val, col): # remove pos and val as it's not used
         self.name = name
         self.pos = pos
         self.val = val

@@ -1,11 +1,9 @@
-class IllegalMove(Exception):
-    pass
-
 class OpponentsPiece(Exception):
     pass
 
 class OpponentPreview(Exception):
     pass
+
 class EmptyBox(Exception):
     pass
 
@@ -22,8 +20,6 @@ class UnNamedFile(Exception):
 class InvalidPromotionInput(Exception):
     pass
 
-class StaleMate(Exception):
-    pass
-
-class CheckMate(Exception):
-    pass
+class EndGame(Exception):
+    def __init__(self, col):
+        super().__init__(col)

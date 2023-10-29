@@ -25,6 +25,8 @@ class Game:
         self.board_sound = settings['sound']
         self.p1 = Player('','')
         self.p2 = Player('','')
+        self.format_time = lambda s: (f"[{s//60}:{s - (s//60)*60}]")
+        self.time_offset = lambda x: (abs(len(self.p1.name) - len(self.p2.name))) if len(self.p1.name if self.p1.col == x else self.p2.name) < len(self.p1.name if self.p1.col != x else self.p2.name) else 0
 
     def _saveGame(self, move):
         with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..', '..', 'data','games', move[5:]+'.json']).lstrip(), 'w') as file:

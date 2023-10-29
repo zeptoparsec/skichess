@@ -7,11 +7,28 @@ from compat.clear import clr
 from engine.player import Player
 from engine.game import Game, board
 from traceback import print_exc
+from pynput.keyboard import Listener
 
 class Pvp(Game):
+    def __print(self):
+        clr()
+        print("Chess pvp")
+        print("White: {}{} {}\nBlack: {}{} {}\n".format(
+                self.p1.name if self.p1.col == 'W' else self.p2.name, 
+                ' '*self.time_offset('W'), 
+                self.format_time(self.time[0]),
+                self.p1.name if self.p1.col == 'B' else self.p2.name,
+                ' '*self.time_offset('B'), 
+                self.format_time(self.time[1])
+            )
+        )
+    
+        board.printBoard(self.legacy, self.turn, self.fixed_board, self.fixed_axis)
+
+        print("\nCommands:")
+        print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1, h\n")
+
     def run(self):
-        format_time = lambda s: ("{}:{}".format(s//60, s - (s//60)*60))
-        time_offset = lambda x: (abs(len(self.p1.name) - len(self.p2.name))) if len(self.p1.name if self.p1.col == x else self.p2.name) < len(self.p1.name if self.p1.col != x else self.p2.name) else 0
         clr()
         print("Chess pvp")
 
@@ -23,32 +40,15 @@ class Pvp(Game):
         then = now = 0
         
         while True:
-            clr()
-            print("Chess pvp")
-            print("White: {}{} [{}]\nBlack: {}{} [{}]\n".format(
-                    self.p1.name if self.p1.col == 'W' else self.p2.name, 
-                    ' '*time_offset('W'), 
-                    format_time(self.time[0]),
-                    self.p1.name if self.p1.col == 'B' else self.p2.name,
-                    ' '*time_offset('B'), 
-                    format_time(self.time[1])
-                )
-            )
-        
-            board.printBoard(self.legacy, self.turn, self.fixed_board, self.fixed_axis)
-
-            print("\nCommands:")
-            print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1, h\n")
+            self.__print()
 
             if self.time[0] <= 0:
                 print('\nBlack ran out of time!')
-                print(self.p1.name if self.p1.col != 'B' else self.p2.name, "wins!")
-                break
+                raise EndGame("White")
             
             if self.time[1] <= 0:
                 print('\nWhite ran out of time!')
-                print(self.p1.name if self.p1.col != 'W' else self.p2.name, "wins!")
-                break
+                raise EndGame("Black")
 
             now = int(datetime.now().timestamp())
             if self.turn: move = input("White's turn: ").lower() #input
@@ -78,17 +78,19 @@ class Pvp(Game):
                 self._makeMove(move)
 
             except InvalidMove as e: print("Invalid Move:", e, "cannot move there")
-            except IllegalMove: print("Check!")
             except OpponentsPiece: print("Cannot move opponent's piece")
             except OpponentPreview: print("Cannot preview opponent's piece")
             except EmptyBox: print("There is no piece there")
             except CaptureOwnPiece: print("Cannot capture your own piece")
             except UnNamedFile: print("File name is required")
             except InvalidPromotionInput: print("Invalid piece: Use Q, B, N, R")
-            except CheckMate: break
-            except StaleMate: break
+            except EndGame as e: 
+                winner = e
+                break
             except Exception: 
+                # print("Invalid input!")
                 print(print_exc())
+                exit()
             else:
                 if not self.preview: 
                     self.turn = not self.turn
@@ -96,8 +98,11 @@ class Pvp(Game):
             sleep(3)
             self.time[int(not self.turn)] -= 3
 
+        self.__print()
         board.restart()
-        del self.p1, self.p2
 
+        print(f"{winner} wins!")
         # Game results here
         print("\nPress any key to continue")
+        with Listener(on_press=lambda key: False) as listener:
+            listener.join()

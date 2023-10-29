@@ -15,14 +15,14 @@ class BoardState:
         self.__board[5] = Piece('B', 5, 3.3, 'B')
         self.__board[6] = Piece('N', 6, 3.2, 'B')
         self.__board[7] = Piece('R', 7, 5, 'B')
-        self.__board[63-0] = Piece('R', 0, 5, 'W')
-        self.__board[63-1] = Piece('N', 1, 3.2, 'W')
-        self.__board[63-2] = Piece('B', 2, 3.3, 'W')
-        self.__board[63-3] = Piece('K', 3, 200, 'W')
-        self.__board[63-4] = Piece('Q', 4, 9, 'W')
-        self.__board[63-5] = Piece('B', 5, 3.3, 'W')
-        self.__board[63-6] = Piece('N', 6, 3.2, 'W')
-        self.__board[63-7] = Piece('R', 7, 5, 'W')
+        self.__board[63-0] = Piece('R', 63-0, 5, 'W')
+        self.__board[63-1] = Piece('N', 63-1, 3.2, 'W')
+        self.__board[63-2] = Piece('B', 63-2, 3.3, 'W')
+        self.__board[63-3] = Piece('K', 63-3, 200, 'W')
+        self.__board[63-4] = Piece('Q', 63-4, 9, 'W')
+        self.__board[63-5] = Piece('B', 63-5, 3.3, 'W')
+        self.__board[63-6] = Piece('N', 63-6, 3.2, 'W')
+        self.__board[63-7] = Piece('R', 63-7, 5, 'W')
 
         for i in range(8,16):
             self.__board[i] = Piece('P', i, 1, 'B')
@@ -34,6 +34,7 @@ class BoardState:
             self.__board[i] = Piece('E', i, 0, 'N')
 
         self.__move_history = ''
+        self.prev_end_pos = None
 
     def printBoard(self, legacy, turn, fixed_board, fixed_axis):
         if legacy:
@@ -75,16 +76,23 @@ class BoardState:
         print()
 
         if self.__move_history == '':
-            sound.boardStartGameSound()
+            sound.boardStartGame()
+            
 
     def restart(self):
         self.__init__()
 
+    def convertPos(self, pos):
+        pass
+
     def preview(self, pos, col):
-        if self.__board[pos].col == 'N': raise EmptyBox
-        if self.__board[pos].col != col: raise OpponentPreview
+        if self.__board[pos].col == 'N': 
+            raise EmptyBox
+        if self.__board[pos].col != col: 
+            raise OpponentPreview
+
         self.__unPreview()
-        for i in CheckMove(self.__board, None).preview(pos):
+        for i in CheckMove(self.__board).preview(pos, self.prev_end_pos):
             if self.__board[i].col == 'N': self.__board[i] = Piece('H', i, 0, 'N')
         return True
 
@@ -104,9 +112,9 @@ class BoardState:
         else: self.__board[start_pos].moved = True
 
         if self.__board[end_pos].name == 'E':
-            sound.boardMoveSound()
+            sound.boardMove()
         else:
-            sound.boardCaptureSound()
+            sound.boardCapture()
 
         self.__board[end_pos] = self.__board[start_pos]
         self.__board[start_pos] = Piece('E',start_pos,0,'N')
@@ -114,8 +122,7 @@ class BoardState:
         if move != None: self.__move_history += move+' '
                 
     def makeMove(self, start_pos, end_pos, turn, move):
-        prev_move = None if len(self.__move_history.split()) == 0 else self.__move_history.split()[-1]
-        checkmove = CheckMove(self.__board, prev_move)
+        checkmove = CheckMove(self.__board)
 
         is_same_colour =  self.__board[end_pos].col == self.__board[start_pos].col
         is_empty_space = self.__board[start_pos].col == 'N'
@@ -125,7 +132,7 @@ class BoardState:
         elif not is_correct_piece: raise OpponentsPiece
         elif is_same_colour: raise CaptureOwnPiece
 
-        move_type = checkmove.validate(start_pos, end_pos)
+        move_type = checkmove.validate(start_pos, end_pos, self.prev_end_pos)
         if move_type == "promotion":
             promo = input("Promote to: ").upper()
             if promo not in "QBNR": raise InvalidPromotionInput
@@ -133,30 +140,47 @@ class BoardState:
             self.__move(start_pos, end_pos, move)
             self.__board[end_pos].name = promo
             self.__board[end_pos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2
-            return
 
         elif move_type == "enpassant":
             killpos = end_pos + (8 if self.__board[start_pos].col == 'W' else -8)
             self.__move(start_pos, end_pos, move)
             self.__board[killpos] = Piece('E',start_pos,0,'N')
-            return
-
-        elif move_type == "castling": # not working
-            offset = 0 if self.__board[start_pos].col == 'B' else 56
+            
+        elif move_type == "castling":
             self.__move(start_pos, end_pos, move)
-            if end_pos == 1 + offset:
-                start_pos = 0 + offset
-                end_pos = 2 + offset
+            match(end_pos):
+                case 2:
+                    rook_start_pos = 0
+                    rook_end_pos = 3
+                case 6:
+                    rook_start_pos = 7
+                    rook_end_pos = 5
+                case 58:
+                    rook_start_pos = 56
+                    rook_end_pos = 59
+                case 62:
+                    rook_start_pos = 63
+                    rook_end_pos = 61
+                case _: 
+                    raise Exception
 
-            elif end_pos == 6 + offset:
-                start_pos = 7 + offset
-                end_pos = 5 + offset
+            self.__move(rook_start_pos, rook_end_pos, None)
+        else:
+            self.__move(start_pos, end_pos, move)
 
-            self.__move(start_pos, end_pos, None)
-            return
+        self.prev_end_pos = end_pos
 
-        self.__move(start_pos, end_pos, move)
-        return
+        #checking if king is alive
+        king_pos = None
+        for i in range(64):
+            if self.__board[i].col == 'N':
+                continue
+            if self.__board[i].name == 'K' and self.__board[i].col != self.__board[end_pos].col:
+                king_pos = i
+                break
+
+        if king_pos == None:
+            raise EndGame('White' if self.__board[end_pos].col == 'W' else 'Black')
 
     def getMoveHistory(self):
         return self.__move_history

@@ -1,31 +1,45 @@
 from engine.errors import *
 import operator
-from board.piece import Piece
 
 class CheckMove:
-    def __init__(self, board, prev_move) -> None:
+    def __init__(self, board) -> None:
         self.board = board
-        self.prev_move = prev_move
 
     def __pawn(self, pos, col):
         moves = list()
-        offset, ops = (0, operator.add) if col == 'B' else (40, operator.sub)
+        if col == 'W':
+            if 0 <= pos - 8 <= 63:
+                if self.board[pos - 8].col == 'N': 
+                    moves.append(pos - 8)
+                
+            if 0 <= pos - 8*2 <= 63 and 48 <= pos <= 55:
+                if self.board[pos - 8*2].col == 'N' or self.board[pos - 8].col == 'N': 
+                    moves.append(pos - 8*2)
 
-        if 0 <= ops(pos, 8) <= 63:
-            if self.board[ops(pos, 8)].col == 'N': 
-                moves.append(ops(pos, 8))
-            
-        if 0 <= ops(pos, 8*2) <= 63 and (offset + 8) <= pos <= (offset + 15):
-            if self.board[ops(pos, 8*2)].col == 'N' or self.board[ops(pos, 8)].col == 'N': 
-                moves.append(ops(pos, 8*2))
+            if 0 <= pos - (8 + 1) <= 63 and pos%8 != 0:
+                if self.board[pos - (8 + 1)].col not in (col + 'N'): 
+                    moves.append(pos - (8 + 1)) # right kill
 
-        if 0 <= ops(pos, (8 + 1)) <= 63 and pos%8 != (0 if col == 'W' else 7):
-            if self.board[ops(pos, (8 + 1))].col not in (col + 'N'): 
-                moves.append(ops(pos, (8 + 1))) # left kill
+            if 0 <= pos - (8 - 1) <= 63 and pos%8 != 7:
+                if self.board[pos - (8 - 1)].col not in (col + 'N'): 
+                    moves.append(pos - (8 - 1)) # left kill
 
-        if 0 <= ops(pos, (8 - 1)) <= 63 and pos%8 != (7 if col == 'W' else 0):
-            if self.board[ops(pos, (8 - 1))].col not in (col + 'N'): 
-                moves.append(ops(pos, (8 - 1))) # right kill
+        elif col == 'B':
+            if 0 <= pos + 8 <= 63:
+                if self.board[pos + 8].col == 'N': 
+                    moves.append(pos + 8)
+                
+            if 0 <= pos + 8*2 <= 63 and 8 <= pos <= 15:
+                if self.board[pos + 8*2].col == 'N' or self.board[pos + 8].col == 'N': 
+                    moves.append(pos + 8*2)
+
+            if 0 <= pos + (8 + 1) <= 63 and pos%8 != 7:
+                if self.board[pos + (8 + 1)].col not in (col + 'N'): 
+                    moves.append(pos + (8 + 1)) # left kill
+
+            if 0 <= pos + (8 - 1) <= 63 and pos%8 != 0:
+                if self.board[pos + (8 - 1)].col not in (col + 'N'): 
+                    moves.append(pos + (8 - 1)) # right kill
 
         return moves
         
@@ -133,87 +147,69 @@ class CheckMove:
         
         return moves
 
-    def __primaryValidation(self):
-        if self.type == 'P':
-            if self.end_pos not in self.__pawn(self.start_pos, self.col): 
-                raise InvalidMove("pawn")
-
-        elif self.type == 'R': 
-            if self.end_pos not in self.__rook(self.start_pos, self.col): 
-                raise InvalidMove("rook")
-        
-        elif self.type == 'N':
-            if self.end_pos not in self.__knight(self.start_pos, self.col): 
-                raise InvalidMove("knight")
-
-        elif self.type == 'B':
-            if self.end_pos not in self.__bishop(self.start_pos, self.col): 
-                raise InvalidMove("bishop")
-
-        elif self.type == 'Q':
-            if self.end_pos not in self.__queen(self.start_pos, self.col): 
-                raise InvalidMove("queen")
-
-        elif self.type == 'K':
-            if self.end_pos not in self.__king(self.start_pos, self.col): 
-                raise InvalidMove("king")
-
-        else: raise Exception
-
-        boardcp = self.board[::]
-        if boardcp[self.end_pos] == 'N':
-            boardcp[self.start_pos], boardcp[self.end_pos] = boardcp[self.end_pos], boardcp[self.start_pos]
-        elif boardcp[self.end_pos] != self.col:
-            boardcp[self.start_pos], boardcp[self.end_pos] = Piece('E',self.start_pos,0,'N'), boardcp[self.start_pos]
-        cmove = CheckMove(boardcp, None)
-        king_pos = 0
-        for i in range(64):
-            if cmove.board[i].name == 'K' and cmove.board[i].col == self.col:
-                king_pos = i
-                break
-        if cmove.check(king_pos, self.board[self.start_pos].col):
-            raise IllegalMove()
-
-        return True
-
     def __promotion(self):
-        if self.end_pos not in self.__pawn(self.start_pos, self.board[self.start_pos].col): return False
+        if self.end_pos not in self.__pawn(self.start_pos, self.col): 
+            return False
+
         offset = 0 if self.board[self.start_pos].col == 'W' else 56
         return offset + 0 <= self.end_pos <= offset + 7
 
-    def __castling(self):
+    def __castling(self, pos, col):
         #(rook, end_pos, start_pos/king_pos, col)
         possible_pos = [(0, 2, 4, 'B'), (7, 6, 4, 'B'), (56, 58, 60, 'W'), (63, 62, 60, 'W')]
-
-        if self.type != 'K': 
-            return False
+        moves = list()
+        if self.board[pos].name != 'K' or self.board[pos].moved or self.board[pos].col != col: 
+            return []
 
         for rook_pos, end_pos, start_pos, col in possible_pos:
-            valid = True
-            if self.board[rook_pos].col != col or self.board[start_pos].col != col:
-                valid = False
-            if self.start_pos != start_pos or self.board[self.start_pos].moved:
-                valid = False
-            if self.board[rook_pos].name != 'R' or self.board[rook_pos].moved:
-                valid = False
-            if self.end_pos != end_pos:
-                valid = False
-            if not valid:
+            if pos != start_pos:
+                continue
+            elif self.board[rook_pos].name != 'R' or self.board[rook_pos].col != col or self.board[rook_pos].moved:
                 continue
 
-            for i in range(min(start_pos, rook_pos), max(start_pos, rook_pos)):
+            for i in range(start:=(min(start_pos, rook_pos)), end:=(max(start_pos, rook_pos) + 1)):
                 if self.check(i, col):
-                    return False
-            break
-        return True
+                    break
+                elif start < i < end - 1 and self.board[i].col != 'N':
+                    break
+            else:
+                moves.append(end_pos)
+        return moves
 
-    def __enpassant(self): # needs revision(check is prev move was that pawn to be killed)
-        offset = 24 if self.board[self.start_pos].col == 'W' else 32
-        kill_pos = self.end_pos + (8 if self.board[self.start_pos].col == 'W' else -8)
-        if self.board[kill_pos].col != 'N': return False
-        if not((self.dx == 1 or self.dx == -1) and self.dy == (1 if self.board[self.start_pos].col == 'B' else -1)): return False
-        if not (offset <= self.start_pos <= 7 + offset) or self.board[kill_pos].moved_again or self.type != 'P': return False
-        return True
+    def __enpassant(self, pos, col, prev_pos):
+        if not(24 <= pos <= 31 or 32 <= pos <= 39):
+            return []
+
+        if col == 'W':
+            possible_pos = [
+                pos - 8 - 1,
+                pos - 8 + 1
+            ]
+            for i in possible_pos:
+                kill_pos = i + 8
+                if self.board[kill_pos].col == 'N':
+                    continue
+
+                if self.board[kill_pos].moved_again or prev_pos != kill_pos:
+                    continue
+
+                return [i]
+
+        elif col == 'B':
+            possible_pos = [
+                pos + 8 - 1, 
+                pos + 8 + 1
+            ]
+            for i in possible_pos:
+                kill_pos = i - 8
+                if self.board[kill_pos].col == 'N':
+                    continue
+
+                if self.board[kill_pos].moved_again or prev_pos != kill_pos:
+                    continue
+
+                return [i]
+        return []
 
     def check(self, pos, col):
         for i in self.__knight(pos, None):
@@ -245,34 +241,82 @@ class CheckMove:
                 return True
         
         return False
+
+    def __primaryValidation(self):
+        if self.name == 'P':
+            if self.end_pos not in self.__pawn(self.start_pos, self.col): 
+                raise InvalidMove("pawn")
+
+        elif self.name == 'R': 
+            if self.end_pos not in self.__rook(self.start_pos, self.col): 
+                raise InvalidMove("rook")
+        
+        elif self.name == 'N':
+            if self.end_pos not in self.__knight(self.start_pos, self.col): 
+                raise InvalidMove("knight")
+
+        elif self.name == 'B':
+            if self.end_pos not in self.__bishop(self.start_pos, self.col): 
+                raise InvalidMove("bishop")
+
+        elif self.name == 'Q':
+            if self.end_pos not in self.__queen(self.start_pos, self.col): 
+                raise InvalidMove("queen")
+
+        elif self.name == 'K':
+            if self.end_pos not in self.__king(self.start_pos, self.col): 
+                raise InvalidMove("king")
+
+        else: raise Exception
+
+        # boardcp = self.board[::]
+        # if boardcp[self.end_pos] == 'N':
+        #     boardcp[self.start_pos], boardcp[self.end_pos] = boardcp[self.end_pos], boardcp[self.start_pos]
+        # elif boardcp[self.end_pos] != self.col:
+        #     boardcp[self.start_pos], boardcp[self.end_pos] = Piece('E',self.start_pos,0,'N'), boardcp[self.start_pos]
+        # cmove = CheckMove(boardcp, None)
+        # king_pos = 0
+        # for i in range(64):
+        #     if cmove.board[i].name == 'K' and cmove.board[i].col == self.col:
+        #         king_pos = i
+        #         break
+        # if cmove.check(king_pos, self.board[self.start_pos].col):
+        #     raise IllegalMove()
+
+        return True
                 
-    def validate(self, start_pos, end_pos):
+    def validate(self, start_pos, end_pos, prev_pos):
         self.start_pos = start_pos
         self.end_pos = end_pos
+        self.prev_pos = prev_pos
         self.col = self.board[start_pos].col
-        self.type = self.board[start_pos].name
-        self.dy = self.end_pos//8 - self.start_pos//8
-        self.dx = self.end_pos%8 - self.start_pos%8
+        self.name = self.board[start_pos].name
+        
+        dx = self.end_pos%8 - self.start_pos%8
 
         complex_move = False
-        if self.type == 'P': 
-            if self.__promotion(): complex_move = "promotion"
-            elif self.__enpassant(): complex_move = "enpassant"
-
-        elif self.type == 'K' and self.__castling(): 
-            complex_move = "castling"
+        if self.name == 'P':
+            if self.__promotion(): 
+                complex_move = "promotion"
+            elif end_pos in self.__enpassant(start_pos, self.col, prev_pos): 
+                complex_move = "enpassant"
+        elif self.name == 'K' and abs(dx) == 2:
+            if end_pos in self.__castling(start_pos, self.col): 
+                complex_move = "castling"
         
-        if not complex_move: return self.__primaryValidation()
-        else: return complex_move
+        if complex_move: 
+            return complex_move
+
+        return self.__primaryValidation()
     
-    def preview(self, pos): 
+    def preview(self, pos, prev_pos): 
         name = self.board[pos].name
         col = self.board[pos].col
 
-        if name == 'P': return self.__pawn(pos, col) # add enpassant pos
+        if name == 'P': return self.__pawn(pos, col) + self.__enpassant(pos, col, prev_pos)
         elif name == 'R': return self.__rook(pos, col)
         elif name == 'N': return self.__knight(pos, col)
         elif name == 'B': return self.__bishop(pos, col)
         elif name == 'Q': return self.__queen(pos, col)
-        elif name == 'K': return self.__king(pos, col) # add castling pos
-        else: raise Exception("Unknown")
+        elif name == 'K': return self.__king(pos, col) + self.__castling(pos, col)
+        else: raise Exception

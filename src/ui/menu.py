@@ -30,13 +30,14 @@ def menu(title, options, setpointer):
 def on_key_updown(key):
     if key == Key.up:
         menucp[1](-1)
-        sound.menuSelectSound()
+        sound.menuSelect()
     elif key == Key.down:
         menucp[1](1)
-        sound.menuSelectSound()
+        sound.menuSelect()
     elif key == Key.enter: 
         if not settings.active_settings["idle_compat"]:
             input()
+        sound.menuEnter()
         return False
 
     menucp[0]()
