@@ -3,6 +3,7 @@ from board.checkMove import CheckMove
 from engine.settings import settings
 from ui.sound import sound
 from board.piece import Piece
+from copy import copy, deepcopy
 
 class BoardState:
     def __init__(self):
@@ -82,9 +83,6 @@ class BoardState:
     def restart(self):
         self.__init__()
 
-    def convertPos(self, pos):
-        pass
-
     def preview(self, pos, col):
         if self.__board[pos].col == 'N': 
             raise EmptyBox
@@ -92,7 +90,7 @@ class BoardState:
             raise OpponentPreview
 
         self.__unPreview()
-        for i in CheckMove(self.__board).preview(pos, self.prev_end_pos):
+        for i in CheckMove(self.__board).getPossibleMoves(pos, self.prev_end_pos):
             if self.__board[i].col == 'N': self.__board[i] = Piece('H', i, 0, 'N')
         return True
 
@@ -108,8 +106,10 @@ class BoardState:
 
     def __move(self, start_pos, end_pos, move):
         self.__unPreview()
-        if self.__board[start_pos].moved: self.__board[start_pos].moved_again = True
-        else: self.__board[start_pos].moved = True
+        if self.__board[start_pos].moved: 
+            self.__board[start_pos].moved_again = True
+        else: 
+            self.__board[start_pos].moved = True
 
         if self.__board[end_pos].name == 'E':
             sound.boardMove()
@@ -119,30 +119,25 @@ class BoardState:
         self.__board[end_pos] = self.__board[start_pos]
         self.__board[start_pos] = Piece('E',start_pos,0,'N')
 
-        if move != None: self.__move_history += move+' '
-                
-    def makeMove(self, start_pos, end_pos, turn, move):
-        checkmove = CheckMove(self.__board)
+        if move != None: 
+            self.__move_history += move+' '
 
-        is_same_colour =  self.__board[end_pos].col == self.__board[start_pos].col
-        is_empty_space = self.__board[start_pos].col == 'N'
-        is_correct_piece = True if turn == (self.__board[start_pos].col == 'W') else False
-        
-        if is_empty_space: raise EmptyBox
-        elif not is_correct_piece: raise OpponentsPiece
-        elif is_same_colour: raise CaptureOwnPiece
+    def loadMove(self, start_pos, end_pos, move): # rename it to what ever u want
+        checkmove = CheckMove(self.__board)
+        col = self.__board[start_pos].col
 
         move_type = checkmove.validate(start_pos, end_pos, self.prev_end_pos)
         if move_type == "promotion":
-            promo = input("Promote to: ").upper()
-            if promo not in "QBNR": raise InvalidPromotionInput
+            promo = input("Promote to: ").upper() # not compatible with load game
+            if promo not in "QBNR": 
+                raise InvalidPromotionInput
 
-            self.__move(start_pos, end_pos, move)
+            self.__move(start_pos, end_pos, move) # add piece that replaced pawn to move_history
             self.__board[end_pos].name = promo
             self.__board[end_pos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2
 
         elif move_type == "enpassant":
-            killpos = end_pos + (8 if self.__board[start_pos].col == 'W' else -8)
+            killpos = end_pos + (8 if col == 'W' else -8)
             self.__move(start_pos, end_pos, move)
             self.__board[killpos] = Piece('E',start_pos,0,'N')
             
@@ -167,21 +162,65 @@ class BoardState:
             self.__move(rook_start_pos, rook_end_pos, None)
         else:
             self.__move(start_pos, end_pos, move)
+                
+    def makeMove(self, start_pos, end_pos, turn, move):
+        board_backup = deepcopy(self.__board)
+        move_history_backup = copy(self.__move_history)
+        col = self.__board[start_pos].col
+        opp_col = 'B' if col == 'W' else 'W'
+
+        is_same_colour =  self.__board[end_pos].col == col
+        is_empty_space = col == 'N'
+        is_correct_piece = (True if turn == (col == 'W') else False) if turn != None else (True)
+        
+        if is_empty_space: raise EmptyBox
+        elif not is_correct_piece: raise OpponentsPiece
+        elif is_same_colour: raise CaptureOwnPiece
+
+        self.loadMove(start_pos, end_pos, move)
+
+        check_move = CheckMove(self.__board)
+        if check_move.check(self.__getKingPos(col), col): # self check
+            self.__board = board_backup
+            self.__move_history = move_history_backup
+            raise Check() 
+
+        if check_move.check(self.__getKingPos(opp_col), opp_col):
+            if self.__checkmate(opp_col):
+                raise Checkmate('White' if col == 'W' else 'Black')
+
+        if self.__checkmate(opp_col):
+            raise Stalemate
 
         self.prev_end_pos = end_pos
 
-        #checking if king is alive
+    def __getKingPos(self, col):
         king_pos = None
         for i in range(64):
-            if self.__board[i].col == 'N':
+            if self.__board[i].name == 'K':
+                if self.__board[i].col == (col):
+                    king_pos = i
+                    break
+        return king_pos
+
+    def __checkmate(self, col):
+        king_pos = self.__getKingPos(col)
+        original_board = deepcopy(self.__board)
+        cm = CheckMove(original_board)
+        for i in range(64):
+            move_king = False
+            if self.__board[i].col != col:
                 continue
-            if self.__board[i].name == 'K' and self.__board[i].col != self.__board[end_pos].col:
-                king_pos = i
-                break
-
-        if king_pos == None:
-            raise EndGame('White' if self.__board[end_pos].col == 'W' else 'Black')
-
+            if self.__board[i].name == 'K':
+                move_king = True
+            for pos in cm.getPossibleMoves(i, self.prev_end_pos):
+                self.loadMove(i, pos, None)
+                if not CheckMove(self.__board).check(pos if move_king else king_pos, col):
+                    self.__board = deepcopy(original_board)
+                    return False
+                self.__board = deepcopy(original_board)
+        return True
+                    
     def getMoveHistory(self):
         return self.__move_history
 

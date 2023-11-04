@@ -20,6 +20,16 @@ class UnNamedFile(Exception):
 class InvalidPromotionInput(Exception):
     pass
 
-class EndGame(Exception):
+class Checkmate(Exception):
     def __init__(self, col):
         super().__init__(col)
+
+class Stalemate(Exception):
+    pass
+
+class TimeOut(Exception):
+    def __init__(self, col):
+        super().__init__(col)
+
+class Check(Exception):
+    pass

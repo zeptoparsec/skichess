@@ -1,5 +1,4 @@
 from engine.errors import *
-import operator
 
 class CheckMove:
     def __init__(self, board) -> None:
@@ -13,7 +12,7 @@ class CheckMove:
                     moves.append(pos - 8)
                 
             if 0 <= pos - 8*2 <= 63 and 48 <= pos <= 55:
-                if self.board[pos - 8*2].col == 'N' or self.board[pos - 8].col == 'N': 
+                if self.board[pos - 8*2].col == 'N' and self.board[pos - 8].col == 'N': 
                     moves.append(pos - 8*2)
 
             if 0 <= pos - (8 + 1) <= 63 and pos%8 != 0:
@@ -30,7 +29,7 @@ class CheckMove:
                     moves.append(pos + 8)
                 
             if 0 <= pos + 8*2 <= 63 and 8 <= pos <= 15:
-                if self.board[pos + 8*2].col == 'N' or self.board[pos + 8].col == 'N': 
+                if self.board[pos + 8*2].col == 'N' and self.board[pos + 8].col == 'N': 
                     moves.append(pos + 8*2)
 
             if 0 <= pos + (8 + 1) <= 63 and pos%8 != 7:
@@ -309,7 +308,7 @@ class CheckMove:
 
         return self.__primaryValidation()
     
-    def preview(self, pos, prev_pos): 
+    def getPossibleMoves(self, pos, prev_pos): 
         name = self.board[pos].name
         col = self.board[pos].col
 
