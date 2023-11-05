@@ -9,9 +9,6 @@ Current features:
 #. Compatibility for terminals which can't be cleared
 #. A settings menu to change a few settings
 
-.. automodule:: ui.interface
-    :members:
-
 .. toctree::
     usage/timer
     usage/piecesounds
