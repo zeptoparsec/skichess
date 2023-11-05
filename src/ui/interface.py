@@ -1,3 +1,9 @@
+"""
+	interface.py
+	============
+	The interface of the chess engine.
+"""
+
 import ui.menu as menu
 from time import sleep
 from os import listdir, path, remove
@@ -7,12 +13,15 @@ from engine.settings import settings
 from compat.osCompat import escapeFilePaths
 from engine.pvp import Pvp
 
-parser = argparse.ArgumentParser(description='Simple chess game')
+args = argparse.Namespace()
 
-parser.add_argument('-t',type=int,default=600)
-parser.add_argument('-i',type=int,default=0)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Simple chess game')
 
-args = parser.parse_args()
+    parser.add_argument('-t',type=int,default=600)
+    parser.add_argument('-i',type=int,default=0)
+
+    args = parser.parse_args()
 
 back = lambda path, remove: path[:-len(remove)] if path.endswith(remove) else path
 curr_dir = " _   _           _              ____                _                   _   _\n| | | |_ __   __| | ___ _ __   / ___|___  _ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __\n| | | | '_ \\ / _` |/ _ \\ '__| | |   / _ \\| '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ \n| |_| | | | | (_| |  __/ |    | |__| (_) | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |\n \\___/|_| |_|\\__,_|\\___|_|     \\____\\___/|_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|\n\n Home"
@@ -76,60 +85,60 @@ def savedGame():
             break
 
 
-# menu tree
-select = [0, 0, 0]
-while True:
-    option = menu.run(curr_dir, ['New Game', 'Saved Game', 'Settings', 'Exit'], select[0])
-    select[0] = option
+if __name__ == "__main__":
+    select = [0, 0, 0]
+    while True:
+        option = menu.run(curr_dir, ['New Game', 'Saved Game', 'Settings', 'Exit'], select[0])
+        select[0] = option
 
-    if option == 0: 
-        newGame()
+        if option == 0:
+            newGame()
 
-    elif option == 1:
-        savedGame()
+        elif option == 1:
+            savedGame()
 
-    elif option == 2: 
-        curr_dir += ' -> Settings'
-        setf = lambda x: ('Enabled' if settings.active_settings[x] else 'Disabled')
-        while True:
-            option = menu.run(
-                curr_dir, 
-                [
-                    'Legacy:      ' + setf('legacy'),
-                    'Fix Board:   ' + setf('fixed_board'),
-                    'Fix Axis:    ' + setf('fixed_axis'),
-                    'Sound:       ' + setf('sound'),
-                    'Idle Compat: ' + setf('idle_compat'),
-                    'Back'
-                ], 
-                select[1]
-            )
-            select[1] = option
+        elif option == 2:
+            curr_dir += ' -> Settings'
+            setf = lambda x: ('Enabled' if settings.active_settings[x] else 'Disabled')
+            while True:
+                option = menu.run(
+                    curr_dir,
+                    [
+                        'Legacy:      ' + setf('legacy'),
+                        'Fix Board:   ' + setf('fixed_board'),
+                        'Fix Axis:    ' + setf('fixed_axis'),
+                        'Sound:       ' + setf('sound'),
+                        'Idle Compat: ' + setf('idle_compat'),
+                        'Back'
+                    ],
+                    select[1]
+                )
+                select[1] = option
 
-            if option == 0: 
-                settings.active_settings['legacy'] = not settings.active_settings['legacy']
+                if option == 0:
+                    settings.active_settings['legacy'] = not settings.active_settings['legacy']
 
-            elif option == 1: 
-                settings.active_settings['fixed_board'] = not settings.active_settings['fixed_board']
-                if settings.active_settings['fixed_board']: 
-                    settings.active_settings['fixed_axis'] = True
+                elif option == 1:
+                    settings.active_settings['fixed_board'] = not settings.active_settings['fixed_board']
+                    if settings.active_settings['fixed_board']:
+                        settings.active_settings['fixed_axis'] = True
 
-            elif option == 2 and not settings.active_settings['fixed_board']:
-                settings.active_settings['fixed_axis'] = not settings.active_settings['fixed_axis']
+                elif option == 2 and not settings.active_settings['fixed_board']:
+                    settings.active_settings['fixed_axis'] = not settings.active_settings['fixed_axis']
 
-            elif option == 3:
-                settings.active_settings['sound'] = not settings.active_settings['sound']
+                elif option == 3:
+                    settings.active_settings['sound'] = not settings.active_settings['sound']
 
-            elif option == 4:
-                settings.active_settings['idle_compat'] = not settings.active_settings['idle_compat']
+                elif option == 4:
+                    settings.active_settings['idle_compat'] = not settings.active_settings['idle_compat']
 
-            elif option == 5:
-                curr_dir = back(curr_dir, " -> Settings")
-                select[1] = 0
-                break
+                elif option == 5:
+                    curr_dir = back(curr_dir, " -> Settings")
+                    select[1] = 0
+                    break
 
-            settings.updateSettings(settings.active_settings)
+                settings.updateSettings(settings.active_settings)
 
-    elif option == 3: break
+        elif option == 3: break
 
 # exit message

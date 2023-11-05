@@ -1,3 +1,9 @@
+"""
+    sound.py
+    ========
+    The sound subsystem.
+"""
+
 from playsound import playsound
 from compat.osCompat import escapeFilePaths
 from engine.settings import settings
@@ -5,6 +11,10 @@ from os import path, system
 from threading import Thread
 
 class Sound:
+    """
+        The Sound class
+        ===============
+    """
     def __init__(self):
         self.sound_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','..','data','sounds'], False)
 
