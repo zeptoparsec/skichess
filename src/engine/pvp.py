@@ -112,9 +112,9 @@ class Pvp(Game):
         board.restart()
 
         if mode == 'checkmate' or mode == 'time':
-            print(f"Check mate\n{winner} wins!")
+            print(f"Checkmate!\n{winner} wins!")
         else:
-            print("It's a stale mate!")
+            print("Stalemate!\nDraw!")
         
         # Game results here
         print("\nPress any key to continue")
