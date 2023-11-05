@@ -122,7 +122,7 @@ class BoardState:
         if move != None: 
             self.__move_history += move+' '
 
-    def loadMove(self, start_pos, end_pos, move): # rename it to what ever u want
+    def commitMove(self, start_pos, end_pos, move):
         checkmove = CheckMove(self.__board)
         col = self.__board[start_pos].col
 
@@ -177,7 +177,7 @@ class BoardState:
         elif not is_correct_piece: raise OpponentsPiece
         elif is_same_colour: raise CaptureOwnPiece
 
-        self.loadMove(start_pos, end_pos, move)
+        self.commitMove(start_pos, end_pos, move)
 
         check_move = CheckMove(self.__board)
         if check_move.check(self.__getKingPos(col), col): # self check
@@ -186,10 +186,10 @@ class BoardState:
             raise Check() 
 
         if check_move.check(self.__getKingPos(opp_col), opp_col):
-            if self.__checkmate(opp_col):
+            if self.__stalemate(opp_col):
                 raise Checkmate('White' if col == 'W' else 'Black')
 
-        if self.__checkmate(opp_col):
+        if self.__stalemate(opp_col):
             raise Stalemate
 
         self.prev_end_pos = end_pos
@@ -203,7 +203,7 @@ class BoardState:
                     break
         return king_pos
 
-    def __checkmate(self, col):
+    def __stalemate(self, col):
         king_pos = self.__getKingPos(col)
         original_board = deepcopy(self.__board)
         cm = CheckMove(original_board)
@@ -214,7 +214,7 @@ class BoardState:
             if self.__board[i].name == 'K':
                 move_king = True
             for pos in cm.getPossibleMoves(i, self.prev_end_pos):
-                self.loadMove(i, pos, None)
+                self.commitMove(i, pos, None)
                 if not CheckMove(self.__board).check(pos if move_king else king_pos, col):
                     self.__board = deepcopy(original_board)
                     return False

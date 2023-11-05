@@ -100,6 +100,6 @@ class Game:
             if not self.fixed_board and (self.fixed_axis and not self.turn): 
                 move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
             if load:
-                board.loadMove(start_pos, end_pos, move)
+                board.commitMove(start_pos, end_pos, move)
             else:
                 board.makeMove(start_pos, end_pos, self.turn, move)
