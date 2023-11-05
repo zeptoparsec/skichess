@@ -2,6 +2,6 @@
     "legacy": false,
     "fixed_board": true,
     "fixed_axis": true,
-    "sound": false,
+    "sound": true,
     "idle_compat": false
 }
