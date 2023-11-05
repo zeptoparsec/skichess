@@ -8,13 +8,13 @@ from engine.player import Player
 board = BoardState()
 
 class Game:
-    def __init__(self, time, turn, load, settings):
+    def __init__(self, time, inc, turn, load, settings):
         self.x_axis = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
         self.y_axis = {'8': 0, '7': 1, '6': 2, '5': 3, '4': 4, '3': 5, '2': 6, '1': 7}
         self.then = 0
         self.now = 0
-        self.time = time
-        self.inc = [0, 0]
+        self.time = [time, time]
+        self.inc = [inc, inc]
         self.turn = turn
         self.load = load
         self.preview = False

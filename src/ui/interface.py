@@ -8,7 +8,10 @@ from compat.osCompat import escapeFilePaths
 from engine.pvp import Pvp
 
 parser = argparse.ArgumentParser(description='Simple chess game')
+
 parser.add_argument('-t',type=int,default=600)
+parser.add_argument('-i',type=int,default=0)
+
 args = parser.parse_args()
 
 back = lambda path, remove: path[:-len(remove)] if path.endswith(remove) else path
@@ -18,7 +21,8 @@ def newGame():
     global curr_dir
     curr_dir += ' -> New Game'
     Pvp(
-        [args.t, args.t], 
+        args.t,
+        args.i,
         True, 
         False, 
         settings.active_settings
@@ -54,7 +58,8 @@ def savedGame():
                         with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','data','games', game_files[option]]),'r') as file:
                             data = json.load(file)
                         
-                            Pvp([args.t, args.t], 
+                            Pvp(args.t,
+                                args.i,
                                 True, 
                                 game_files[option], 
                                 settings.active_settings
