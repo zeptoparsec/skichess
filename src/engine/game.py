@@ -57,7 +57,7 @@ class Game:
         settings.updateSettings(settings.active_settings)
         
         for i in moves:
-            self._makeMove(i)
+            self._makeMove(i, load=True)
             self.turn = not self.turn
             
         settings.active_settings['sound'] = temp
@@ -72,27 +72,6 @@ class Game:
             newpos = 63 - newpos
         return newpos
 
-    def _backupMakeMove(self, move):
-        if not (move[0].isalpha and move[1].isdigit()): raise Exception
-        start_pos = self.__axisToPos(move[0], move[1])
-
-        if move == 'h':
-            board.highlight()
-            self.preview = True
-
-        elif len(move) == 2:
-            if board.preview(start_pos, 'W' if self.turn else 'B') is True:
-                self.preview = True
-
-        elif len(move) == 4 : 
-            if not (move[2].isalpha and move[3].isdigit()): raise Exception
-            end_pos = self.__axisToPos(move[2], move[3])
-            if not self.fixed_board and (self.fixed_axis and not self.turn): 
-                move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
-            board.makeMove(start_pos, end_pos, self.turn, move.lower())
-
-        else: raise Exception
-
     def __validateMove(self, move):
         for i, v in enumerate(move):
             if i % 2 == 0:
@@ -102,7 +81,7 @@ class Game:
                 if not v.isdigit():
                     raise Exception
 
-    def _makeMove(self, move):
+    def _makeMove(self, move, load=False):            
         self.__validateMove(move)
         if move == 'h':
             board.highlight()
@@ -120,6 +99,7 @@ class Game:
             end_pos = self.__axisToPos(move[2], move[3])
             if not self.fixed_board and (self.fixed_axis and not self.turn): 
                 move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
-            
-            board.makeMove(start_pos, end_pos, self.turn, move)
-            return
+            if load:
+                board.loadMove(start_pos, end_pos, move)
+            else:
+                board.makeMove(start_pos, end_pos, self.turn, move)

@@ -29,6 +29,7 @@ class Pvp(Game):
         print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1, h\n")
 
     def run(self):
+        winner = None
         clr()
         print("Chess pvp")
 
@@ -44,11 +45,11 @@ class Pvp(Game):
 
             if self.time[0] <= 0:
                 print('\nBlack ran out of time!')
-                raise EndGame("White")
+                raise TimeOut("White")
             
             if self.time[1] <= 0:
                 print('\nWhite ran out of time!')
-                raise EndGame("Black")
+                raise TimeOut("Black")
 
             now = int(datetime.now().timestamp())
             if self.turn: move = input("White's turn: ").lower() #input
@@ -84,7 +85,16 @@ class Pvp(Game):
             except CaptureOwnPiece: print("Cannot capture your own piece")
             except UnNamedFile: print("File name is required")
             except InvalidPromotionInput: print("Invalid piece: Use Q, B, N, R")
-            except EndGame as e: 
+            except Check: print("Check!")
+            except Checkmate as e: 
+                mode = 'checkmate'
+                winner = e
+                break
+            except Stalemate as e:
+                mode = 'stalemate'
+                break
+            except TimeOut as e:
+                mode = 'timeout'
                 winner = e
                 break
             except Exception: 
@@ -101,7 +111,11 @@ class Pvp(Game):
         self.__print()
         board.restart()
 
-        print(f"{winner} wins!")
+        if mode == 'checkmate' or mode == 'time':
+            print(f"Check mate\n{winner} wins!")
+        else:
+            print("It's a stale mate!")
+        
         # Game results here
         print("\nPress any key to continue")
         with Listener(on_press=lambda key: False) as listener:
