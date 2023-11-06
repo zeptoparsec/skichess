@@ -7,35 +7,35 @@ from copy import copy, deepcopy
 
 class BoardState:
     def __init__(self):
-        self.__board = [Piece('E', 0, 0, 'N')]*64
-        self.__board[0] = Piece('R', 0, 5, 'B')
-        self.__board[1] = Piece('N', 1, 3.2, 'B')
-        self.__board[2] = Piece('B', 2, 3.3, 'B')
-        self.__board[3] = Piece('Q', 3, 9, 'B')
-        self.__board[4] = Piece('K', 4, 200, 'B')
-        self.__board[5] = Piece('B', 5, 3.3, 'B')
-        self.__board[6] = Piece('N', 6, 3.2, 'B')
-        self.__board[7] = Piece('R', 7, 5, 'B')
-        self.__board[63-0] = Piece('R', 63-0, 5, 'W')
-        self.__board[63-1] = Piece('N', 63-1, 3.2, 'W')
-        self.__board[63-2] = Piece('B', 63-2, 3.3, 'W')
-        self.__board[63-3] = Piece('K', 63-3, 200, 'W')
-        self.__board[63-4] = Piece('Q', 63-4, 9, 'W')
-        self.__board[63-5] = Piece('B', 63-5, 3.3, 'W')
-        self.__board[63-6] = Piece('N', 63-6, 3.2, 'W')
-        self.__board[63-7] = Piece('R', 63-7, 5, 'W')
+        self.__board = [Piece('E', 0, 'N')]*64
+        self.__board[0] = Piece('R', 5, 'B')
+        self.__board[1] = Piece('N', 3.2, 'B')
+        self.__board[2] = Piece('B', 3.3, 'B')
+        self.__board[3] = Piece('Q', 9, 'B')
+        self.__board[4] = Piece('K', 200, 'B')
+        self.__board[5] = Piece('B', 3.3, 'B')
+        self.__board[6] = Piece('N', 3.2, 'B')
+        self.__board[7] = Piece('R', 5, 'B')
+        self.__board[63-0] = Piece('R', 5, 'W')
+        self.__board[63-1] = Piece('N', 3.2, 'W')
+        self.__board[63-2] = Piece('B', 3.3, 'W')
+        self.__board[63-3] = Piece('K', 200, 'W')
+        self.__board[63-4] = Piece('Q', 9, 'W')
+        self.__board[63-5] = Piece('B', 3.3, 'W')
+        self.__board[63-6] = Piece('N', 3.2, 'W')
+        self.__board[63-7] = Piece('R', 5, 'W')
 
         for i in range(8,16):
-            self.__board[i] = Piece('P', i, 1, 'B')
+            self.__board[i] = Piece('P', 1, 'B')
 
         for i in range(48,56):
-            self.__board[i] = Piece('P', i, 1, 'W')
+            self.__board[i] = Piece('P', 1, 'W')
 
         for i in range(16,48):
-            self.__board[i] = Piece('E', i, 0, 'N')
+            self.__board[i] = Piece('E', 0, 'N')
 
         self.__move_history = ''
-        self.prev_end_pos = None
+        self.__prev_end_pos = None
 
     def printBoard(self, legacy, turn, fixed_board, fixed_axis):
         if legacy:
@@ -79,7 +79,6 @@ class BoardState:
         if self.__move_history == '':
             sound.boardStartGame()
             
-
     def restart(self):
         self.__init__()
 
@@ -90,19 +89,19 @@ class BoardState:
             raise OpponentPreview
 
         self.__unPreview()
-        for i in CheckMove(self.__board).getPossibleMoves(pos, self.prev_end_pos):
-            if self.__board[i].col == 'N': self.__board[i] = Piece('H', i, 0, 'N')
+        for i in CheckMove(self.__board).getPossibleMoves(pos, self.__prev_end_pos):
+            if self.__board[i].col == 'N': self.__board[i] = Piece('H', 0, 'N')
         return True
 
     def __unPreview(self):
         for i in range(64):
             if self.__board[i].name == 'H' and self.__board[i].col == 'N':
-                self.__board[i] = Piece('E', i ,0 , 'N')
+                self.__board[i] = Piece('E' ,0 , 'N')
 
     def highlight(self):
         for i in range(64):
             if self.__board[i].col == 'N':
-                self.__board[i] = Piece('H', i, 0, 'N')
+                self.__board[i] = Piece('H', 0, 'N')
 
     def __move(self, start_pos, end_pos, move):
         self.__unPreview()
@@ -117,7 +116,7 @@ class BoardState:
             sound.boardCapture()
 
         self.__board[end_pos] = self.__board[start_pos]
-        self.__board[start_pos] = Piece('E',start_pos,0,'N')
+        self.__board[start_pos] = Piece('E',0,'N')
 
         if move != None: 
             self.__move_history += move+' '
@@ -126,20 +125,20 @@ class BoardState:
         checkmove = CheckMove(self.__board)
         col = self.__board[start_pos].col
 
-        move_type = checkmove.validate(start_pos, end_pos, self.prev_end_pos)
+        move_type = checkmove.validate(start_pos, end_pos, self.__prev_end_pos)
         if move_type == "promotion":
-            promo = input("Promote to: ").upper() # not compatible with load game
+            promo = input("Promote to: ").upper()
             if promo not in "QBNR": 
                 raise InvalidPromotionInput
 
-            self.__move(start_pos, end_pos, move) # add piece that replaced pawn to move_history
+            self.__move(start_pos, end_pos, move)
             self.__board[end_pos].name = promo
             self.__board[end_pos].val = 9 if promo == 'Q' else 5 if promo == 'R' else 3.3 if promo == 'B' else 3.2
 
         elif move_type == "enpassant":
             killpos = end_pos + (8 if col == 'W' else -8)
             self.__move(start_pos, end_pos, move)
-            self.__board[killpos] = Piece('E',start_pos,0,'N')
+            self.__board[killpos] = Piece('E',0,'N')
             
         elif move_type == "castling":
             self.__move(start_pos, end_pos, move)
@@ -192,7 +191,7 @@ class BoardState:
         if self.__stalemate(opp_col):
             raise Stalemate
 
-        self.prev_end_pos = end_pos
+        self.__prev_end_pos = end_pos
 
     def __getKingPos(self, col):
         king_pos = None
@@ -213,7 +212,7 @@ class BoardState:
                 continue
             if self.__board[i].name == 'K':
                 move_king = True
-            for pos in cm.getPossibleMoves(i, self.prev_end_pos):
+            for pos in cm.getPossibleMoves(i, self.__prev_end_pos):
                 self.commitMove(i, pos, None)
                 if not CheckMove(self.__board).check(pos if move_king else king_pos, col):
                     self.__board = deepcopy(original_board)
@@ -226,3 +225,25 @@ class BoardState:
 
     def loadGame(self, move_history):
         self.__move_history = move_history
+
+    def getBoard(self):
+        board = []
+        for i in range(64):
+            board.append([
+                self.__board[i].name, 
+                self.__board[i].val, 
+                self.__board[i].col, 
+                self.__board[i].moved, 
+                self.__board[i].moved_again
+            ])
+        return board
+
+    def setBoard(self, board):
+        for i in range(64):
+            self.__board[i] = Piece(*board[i])
+
+    def getPrevEndPos(self):
+        return self.__prev_end_pos
+
+    def setPrevEndPos(self, prev_end_pos):
+        self.__prev_end_pos = prev_end_pos

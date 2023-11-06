@@ -1,8 +1,8 @@
 class Piece:
-    def __init__(self, name, pos, val, col): # remove pos and val as it's not used
+    def __init__(self, name, val, col, moved=False, moved_again=False): # remove pos and val as it's not used
         self.name = name
-        self.pos = pos
+        # self.pos = pos
         self.val = val
         self.col = col
-        self.moved = False
-        self.moved_again = False
+        self.moved = moved
+        self.moved_again = moved_again

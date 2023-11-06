@@ -31,7 +31,9 @@ class Game:
     def _saveGame(self, move):
         with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..', '..', 'data','games', move[5:]+'.json']).lstrip(), 'w') as file:
             lines = {
-                'moves': board.getMoveHistory(),
+                'board': board.getBoard(),
+                'prev_end_pos': board.getPrevEndPos(),
+                'turn': self.turn,
                 'wtime': self.time[0],
                 'btime': self.time[1],
                 'white': self.p1.name if self.p1.col == 'W' else self.p2.name,
@@ -44,27 +46,14 @@ class Game:
     def _loadGame(self):
         with open(path.dirname(path.abspath(__file__)) + escapeFilePaths(['..', '..', 'data','games', self.load]),'r') as file:
             data = json.load(file)
-            moves = data['moves'].split()
 
-        fixed_axis, fixed_board = self.fixed_axis, self.fixed_board
-        self.fixed_axis, self.fixed_board = False, False
+        self.turn = data['turn']
         self.time = [data['wtime'], data['btime']]
         self.p1 = Player(data['white'], 'W')
         self.p2 = Player(data['black'], 'B')
 
-        temp = settings.active_settings['sound']
-        settings.active_settings['sound'] = False
-        settings.updateSettings(settings.active_settings)
-        
-        for i in moves:
-            self._makeMove(i, load=True)
-            self.turn = not self.turn
-            
-        settings.active_settings['sound'] = temp
-        settings.updateSettings(settings.active_settings)
-
-        board.loadGame(' '.join([str(i) for i in moves]) + ' ')
-        self.fixed_axis, self.fixed_board = fixed_axis, fixed_board
+        board.setBoard(data['board'])
+        board.setPrevEndPos(data['prev_end_pos'])
 
     def __axisToPos(self, x, y):
         newpos = self.x_axis[x] + self.y_axis[y]*8 - 1
@@ -99,7 +88,5 @@ class Game:
             end_pos = self.__axisToPos(move[2], move[3])
             if not self.fixed_board and (self.fixed_axis and not self.turn): 
                 move = chr(201 - ord(move[0])) + str(9 - int(move[1])) + chr(201 - ord(move[2])) + str(9 - int(move[3]))
-            if load:
-                board.commitMove(start_pos, end_pos, move)
-            else:
-                board.makeMove(start_pos, end_pos, self.turn, move)
+                
+            board.makeMove(start_pos, end_pos, self.turn, move)
