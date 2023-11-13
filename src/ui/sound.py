@@ -4,12 +4,13 @@
     The sound subsystem.
 """
 
-from pydub import AudioSegment
-from pydub.playback import play
+from playsound import playsound
 from compat.osCompat import escapeFilePaths
 from engine.settings import settings
 from os import path, system
-from threading import Thread
+from threading import Thread, Lock
+
+lock = Lock()
 
 class Sound:
     """
@@ -19,18 +20,23 @@ class Sound:
     def __init__(self):
         self.sound_path = path.dirname(path.abspath(__file__)) + escapeFilePaths(['..','..','data','sounds'], False)
 
-        self.menu_select = self.sound_path + 'menu_select.wav'
-        self.menu_enter = self.sound_path + 'menu_enter.wav'
+        self.menu_select = self.sound_path + 'menu_select.mp3'
+        self.menu_enter = self.sound_path + 'menu_enter.mp3'
 
         self.board_start_game = self.sound_path + 'board_start_game.mp3'
         self.board_move = self.sound_path + 'board_move.mp3'
         self.board_capture = self.sound_path + 'board_capture.mp3'
 
+    def __safeplay(self,path):
+        if lock.locked():
+            return
+            
+        with lock:
+            playsound(path)
+
     def __playSound(self, path):
         if settings.active_settings['sound']:
-            sound = AudioSegment.from_file(path, format="mp3")
-            play(sound)
-            #Thread(target=play, args=(sound)).start() # Need to use a different module to play sound
+            Thread(target=self.__safeplay, args=(path,)).start() # Need to use a different module to play sound
 
     def boardStartGame(self):
         self.__playSound(self.board_start_game)

@@ -6,7 +6,6 @@ from compat.osCompat import *
 from compat.clear import clr
 from engine.player import Player
 from engine.game import Game, board
-from traceback import print_exc
 from pynput.keyboard import Listener
 
 class Pvp(Game):
@@ -15,18 +14,18 @@ class Pvp(Game):
         print("Chess pvp")
         print("White: {}{} {}\nBlack: {}{} {}\n".format(
                 self.p1.name if self.p1.col == 'W' else self.p2.name, 
-                ' '*self.time_offset('W'), 
-                self.format_time(self.time[0]),
+                ' '*self._time_offset('W'), 
+                self._format_time(self.time[0]),
                 self.p1.name if self.p1.col == 'B' else self.p2.name,
-                ' '*self.time_offset('B'), 
-                self.format_time(self.time[1])
+                ' '*self._time_offset('B'), 
+                self._format_time(self.time[1])
             )
         )
     
         board.printBoard(self.legacy, self.turn, self.fixed_board, self.fixed_axis)
 
         print("\nCommands:")
-        print(" back\n restart\n save: <file name>\n <move>: eg - b1a3, b1, h\n")
+        print(" back\n restart\n resign\n draw\n save: <file name>\n <move>: eg - b1a3, b1, h\n")
 
     def run(self):
         winner = None
@@ -70,6 +69,19 @@ class Pvp(Game):
                     self.turn = True
                     continue
 
+                if move == 'resign':
+                    end_game_type = 'resign'
+                    winner = 'White' if not self.turn else 'Black'
+                    break
+
+                if move == 'draw':
+                    print('Draw requested!')
+                    choice = input('(y/n): ').lower()
+                    if choice == 'y':
+                        end_game_type = 'draw'
+                        break
+                    continue
+
                 if move.__contains__('save:'): 
                     if len(move) == 5: raise UnNamedFile
                     self._saveGame(move)
@@ -87,20 +99,18 @@ class Pvp(Game):
             except InvalidPromotionInput: print("Invalid piece: Use Q, B, N, R")
             except Check: print("Check!")
             except Checkmate as e: 
-                mode = 'checkmate'
+                end_game_type = 'checkmate'
                 winner = e
                 break
             except Stalemate as e:
-                mode = 'stalemate'
+                end_game_type = 'stalemate'
                 break
             except TimeOut as e:
-                mode = 'timeout'
+                end_game_type = 'timeout'
                 winner = e
                 break
             except Exception: 
-                # print("Invalid input!")
-                print(print_exc())
-                exit()
+                print("Invalid input!")
             else:
                 if not self.preview: 
                     self.turn = not self.turn
@@ -111,12 +121,18 @@ class Pvp(Game):
         self.__print()
         board.restart()
 
-        if mode == 'checkmate' or mode == 'time':
-            print(f"Checkmate!\n{winner} wins!")
-        else:
-            print("Stalemate!\nDraw!")
+        match end_game_type:
+            case 'checkmate':
+                print(f"Checkmate!\n{winner} wins!")
+            case 'stalemate':
+                print("Stalemate!\nDraw!")
+            case 'time':
+                print(f"Time Up!\n{winner} wins!")
+            case 'resign':
+                print(f"{'Black' if winner == 'White' else 'White'} resigned\n{winner} wins!")
+            case 'draw':
+                print("Draw!")
         
-        # Game results here
         print("\nPress any key to continue")
         with Listener(on_press=lambda key: False) as listener:
             listener.join()

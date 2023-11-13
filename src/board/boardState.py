@@ -34,7 +34,7 @@ class BoardState:
         for i in range(16,48):
             self.__board[i] = Piece('E', 0, 'N')
 
-        self.__move_history = ''
+        self.__move_history = '' # do we need this now?
         self.__prev_end_pos = None
 
     def printBoard(self, legacy, turn, fixed_board, fixed_axis):
@@ -247,3 +247,4 @@ class BoardState:
 
     def setPrevEndPos(self, prev_end_pos):
         self.__prev_end_pos = prev_end_pos
+
