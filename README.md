@@ -1,2 +1,3 @@
-A simple python terminal chess interface
+Skichess
 ========================================
+A simple python terminal chess interface.
